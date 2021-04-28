@@ -2,10 +2,9 @@ $(document).ready(function() {
     //DOM setup
 
     //add Quizlet++ button
-    $(".TopNavigation-contentRight").prepend(`<div class='TopNavigationItem'><button class="SiteActivity-button quizletplusplusbutton" type="button" style='border-radius:25px;padding:0px 12px;font-family:hurme_no2-webfont;font-kerning: normal;font-size: 14px;font-weight:600;'>Quizlet++</button></div>`);
-
+    $(".arc6ilh").prepend(`<div class='onbpm9l'><button class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding AssemblyButtonBase--border quizletplusplusbutton" type="button" style="margin-right:16px">Quizlet++</button></div>`);
     //remove free trial button
-    $(".TopNavigation-contentRight .TopNavigationItem:eq(1)").remove();
+    //$(".TopNavigation-contentRight .TopNavigationItem:eq(1)").remove();
     
     //add Quizlet++ popup container
     $(".ModeLayout-content").append("<div class='quizletpluspluspopupcontainer'></div>");
