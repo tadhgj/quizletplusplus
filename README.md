@@ -2,6 +2,7 @@
 Quizlet Hacks
 
 Chrome Extension Link (This works if you're on MS Edge (2020+) too)
+(pending review, link dead as of 8/7/2022)
 https://chrome.google.com/webstore/detail/quizlet++/ikpjogookicblaeiilbdjmgbdjkhpjjg
 
 ### Overview
@@ -9,7 +10,7 @@ This is a chrome extension that helps students quickly complete Quizlet activiti
 
 ### Working Features
 * Highlights (on mouse hover) the correct answer in a multiple choice question in **Learn mode**.
-* Intercepts and replaces keypresses to spell out the correct answer in a written question in either **Learn or Write mode**.
+* Intercepts and replaces keypresses to spell out the correct answer in a written question in Learn mode.
 * Has a button to activate the service (which is constantly broken on Quizlet page design refreshes)
 * Has a popup system that indicates when the service has been activated, or detected a flashcard match.
 
