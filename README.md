@@ -1,8 +1,7 @@
 # Quizlet++
 Quizlet Hacks
 
-Chrome Extension Link (This works if you're on MS Edge (2020+) too)
-(pending review, link dead as of 8/7/2022)
+Chrome Extension Link (Working on any browser that supports Chromium extensions)
 https://chrome.google.com/webstore/detail/quizlet++/ikpjogookicblaeiilbdjmgbdjkhpjjg
 
 ### Overview
