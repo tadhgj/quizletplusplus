@@ -6,6 +6,11 @@ $(document).ready(function() {
 
     //remove free trial button
     $(".TopNavigation-contentRight .TopNavigationItem:eq(1)").remove();
+    // inside div.TopNavigation-contentRight is a div containing: button:contains("Upgrade")
+    //Upgrade: free 7-day trial
+
+    $(".TopNavigation-contentRight .TopNavigationItem:contains('Upgrade')").remove();
+    
     
     //add Quizlet++ popup container
     $(".ModeLayout-content").append("<div class='quizletpluspluspopupcontainer'></div>");
@@ -20,7 +25,7 @@ $(document).ready(function() {
             popup("Quizlet++ is now working. Correct answers will be indicated with a dashed border on mouseover. Click away!");
             serviceRunning = true;
             collectTermData();
-            checkFlashcard();
+            checkWriting();
         }
     });
 
@@ -53,6 +58,88 @@ $(document).ready(function() {
       console.log("Flashcard change did nothing. Service not running yet.")
     }
   });
+
+  //writing
+  function checkWriting() {
+    // get question...
+    let question = $("div[data-testid='Question Text']");
+    console.log("question:", question);
+
+    // let questionText = question.find(".FormattedText").text();
+    let questionHTML = question.find(".FormattedText div");
+
+    // replace <br> with \n
+    // let questionText = questionHTML[0].innerText;
+    let questionText = questionHTML.html().replace(/<br>/g, "\n");
+
+    // console.log("questionText: " + questionText)
+    // print questionText as raw text to console
+    // that means \n will be printed as \n
+    // and not as a new line
+    // console.log("questionTexti: " + questionText)
+    console.log("questionText:", {
+        "0": questionText
+    })
+
+    let flashCardText = questionText;
+
+
+    //fetch text
+    // var flashCardText = $(".a5hy006 .FormattedText").text();
+    // if (flashCardText == "") {
+    //     flashCardText = $(".FixedQuestionLayout-content .FormattedTextWithImage div").text();
+    // }
+    console.log(flashCardText);
+
+    //check if flashcard content exists in set
+    //THIS IS WHERE THE SETTINGS CHECK WOULD COME IN HANDY
+    flashCardAnswer = findOtherBestMatch(flashCardText);
+    if (flashCardAnswer == null) {
+        console.log("err");
+        return;
+    }
+
+    //ALL CLEAR BOYS, THE TERM HAS BEEN FOUND
+    console.log(flashCardAnswer);
+
+    //check if flashcard content actually changed!
+    if (previousText == flashCardText) {
+        console.log("duplicate");
+        //return;
+    }
+    else {
+
+        currentCharCount = 0;
+        popup(flashCardText + "::" + flashCardAnswer);
+    }
+    previousText = flashCardText;
+
+
+    //send popup
+
+    //enable listening
+    upArrowListen = true;
+
+    // add span w/ correct answer to input
+    //label.AssemblyInput
+    let parentAppned = $("label.AssemblyInput");
+
+    // check if div.correctAnswer already exists
+    if (parentAppned.find("div.correctAnswer").length > 0) {
+        return;
+    }
+
+    // else...
+    let span = $("<div>").attr({
+        "class": "correctAnswer"
+    }).append(
+        $("<span>").text("").addClass("typed"),
+        $("<span>").text("").addClass("restOf")
+    )
+    parentAppned.append(span);
+    updatePlaceholder();
+
+  }
 
   //DETECT CURRENT FLASHCARD INFO
   var previousText;

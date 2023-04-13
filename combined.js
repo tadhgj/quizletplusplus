@@ -20,6 +20,19 @@ $(document).ready(function() {
         });
     }
 
+    //DEBUG
+    // $('.StudyModesLayout').on('DOMSubtreeModified', function(e){
+    //     // print out class and name of  element that changed
+    //     console.log("DOM MODIFY:",e,e.target.className, e.target.nodeName);
+
+    //     // notes:
+    //     // from wrong answer to another flashcard...
+    //     // DOM MODIFY: lw557v3 DIV
+    // });
+
+    // I want to listen for DOMSubtreeModified, and want to fire a function after a burst of changes
+    // so I want to wait for a burst of changes to stop, and then fire a function
+
 
     waitForElm("#convenientCode").then((elm) => {
         console.log("combined.js active...");
@@ -27,6 +40,9 @@ $(document).ready(function() {
 
         //add Quizlet++ button
         $(".anbpm9l").prepend(`<div class='o1c0xcc3'><button class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding AssemblyButtonBase--border quizletplusplusbutton" type="button" style="margin-right:16px">Q++</button></div>`);
+
+        //add debug button
+        // $(".anbpm9l").prepend(`<div class='o1c0xcc3'><button class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding AssemblyButtonBase--border quizletplusplusdbutton" type="button" style="margin-right:16px">Debug</button></div>`);
 
         //remove free trial button
         //$(".TopNavigation-contentRight .TopNavigationItem:eq(1)").remove();
@@ -41,16 +57,25 @@ $(document).ready(function() {
             console.log("Quizlet++ Button Click");
             $(".quizletplusplusbutton").text("Quizlet++ ✔️");
             if (!serviceRunning) {
-                popup("Quizlet++ is now working. Correct answers will be indicated with a dashed border on mouseover. Click away!");
+                popup("Quizlet++ is now working|. Correct answers will be indicated with a dashed border on mouseover. Click away!");
                 serviceRunning = true;
                 collectTermData();
                 checkLearnView();
             }
             else {
                 //make popup here!
-                console.log(upArrowListen);
+                // console.log(upArrowListen);
+
+                // just in case...
+                // checkLearnView();
             }
         });
+
+        // ON CLICK OF DEBUG BUTTON
+        // $(".site").on("click",".quizletplusplusdbutton", function() {
+        //     console.log("Debug Button Click");
+        //     checkLearnView();
+        // });
 
         //COLLECT TERM DATA FROM PAGE (Using HTML because of limitations with chrome extensions and their lack of ability in accessing window objects because they're run in a "secure bullshitty thing")
         var termObj;
@@ -74,353 +99,392 @@ $(document).ready(function() {
         //FIRE ON FLASHCARD CHANGE
         var serviceRunning = false;
 
+        $('.StudyModesLayout').on('DOMSubtreeModified', DOMthing);
+
+
+        let prevTimestampDom = 0;
+        let threshold = 1000;
+        let timeoutList = [];
+        function DOMthing(e) {
+            // filter.
+            let Currtarget = e.currentTarget.className;
+            let target = e.target.nodeName;
+            if (Currtarget != "StudyModesLayout" || target != "DIV") {
+                return;
+            }
+            
+            
+            console.log(e);
+            console.log("DOMthing");
+
+            //valid ends
+
+            // flashcard to MCQ
+            // lw557v3
+            // lw557v3
+            // reyok18
+
+            // MCQ to MCQ
+            // m1crz3gf
+            // lw557v3
+            // lw557v3
+
+            // writing to writing
+            // a13cru74
+            // a13cru74
+            // a13cru74
+            // lw557v3
+            // lw557v3
+
+            // writing to MCQ
+            // (ends in)
+            // lw557v3
+            // lw557v3
+            // reyok18
+
+            // MCQ to writing
+
+            let target2 = e.target.className;
+            console.log(target2);
+
+            if (target2 != "lw557v3" && target2 != "reyok18") {
+                return;
+            }
+            checkLearnView();
+
+
+            // console.log(e);
+            // let currTime = Date.now();
+            // prevTimestampDom = currTime;
+
+            // timeoutList.push(setTimeout(function() {
+            //     if (Date.now() - prevTimestampDom >= threshold) {
+            //         console.log("DOMthing() fired");
+            //         checkLearnView();
+            //     }
+            //     else {
+            //         console.log("DOMthing() not fired");
+            //     }
+            // }, threshold));
+        }
+
         function checkLearnView() {
             if (serviceRunning) {
-                //console.log(e);
-                console.log("flashcard changed. checking element now");
-                //determine the type of flashcard present.
+                console.log("checkLearnView()");
 
-                let currentElements = $('.StudyModesLayout article').children();
-                console.log("current possible elements:");
-                console.log(currentElements);
+                // states that we may be in:
+                // 1. Multiple choice question
+                // 2. Flashcard
+                // 3. Written Question
 
-                //current elements has 1 or two direct children. one is a progress bar, which is not important.
-                let currentElement;
+                // can detect "wrong answer" state
+                // the parent div of article is .lw557v3
+                // and the second child of .lw557v3 is the "press any key to continue" bar
+                // not important today
 
-                if (currentElements.length == 1) {
-                    currentElement = currentElements[0];
-                }
-                else if (currentElements.length == 2) {
-                    currentElement = currentElements[0];
-                }
-                else {
-                    //right now there's no children. break
-                    console.log("no children, skipping");
+
+                // 1: multiple choice question
+                let mcqTest = $('.StudyModesLayout article').find("div[data-testid='MCQ Answers']");
+
+                if (mcqTest.length > 0) {
+                    console.log("Multiple Choice");
+                    checkMultipleChoice();
                     return;
                 }
-                console.log("current element:");
-                console.log(currentElement);
-
-                //if element is qjwdgny, this is a writing thing
-                //if element is a5hy006, this is a flashcard thing
 
 
+                // 2: flashcard
+                let flashcardTest = $('.StudyModesLayout').find("div[data-testid='FlippableFlashcard-front']");
+                let flashcardTest2 = $('.StudyModesLayout').find("div[data-testid='FlippableFlashcard-back']");
 
-                //handle class cases
-                let currentClass = $(currentElement).attr("class");
+                if (flashcardTest.length > 0 && flashcardTest2.length > 0) {
+                    console.log("Flashcard");
+                    // checkFlashcard();
+                    return;
+                }
+
                 
-                console.log("current class:");
-                console.log(currentClass);
+                // 3: written question
+                let writtenTest = $('.StudyModesLayout article').find("label.AssemblyInput");
 
-                if (currentClass == "qjwdgny") {
+                if (writtenTest.length > 0) {
+                    console.log("Written Question");
                     checkWriting();
-                }
-                else if (currentClass == "a5hy006") {
-                    checkFlashcard();
+                    return;
                 }
 
-                /*if (currentClass.includes("FixedActionLayout")) {
-                    let currentNestedClass = $($(currentElement).children()[0].children[0]).attr("class");
-                    console.log(currentNestedClass);
-                    if (currentNestedClass.includes("ScrollableViewLayout")) {
-                        //writing prompt
-                        checkWriting();
-                    }
+                // 4: other test
+                console.log("too far");
+                return;
 
-                    //WRITING QUESTION EXAMPLE...
-                        //<div class="qjwdgny">
-                            // <div class="a5hy006">
-                            // 	<div class="w1ssq2st grq2jtf">
-                            // 		<div class="w1ssq2st hhz8wgl">
-                            // 			<div class="w1ssq2st l1dr47li">
-                            // 				<section class="l1qy775d">Definition</section>
-                            // 				<div class="as9ks2b">
-                            // 					<button type="button" aria-label="sound" class="AssemblyButtonBase AssemblyIconButton AssemblyIconButton--tertiary AssemblyIconButton--circle AssemblyButtonBase--small AssemblyButtonBase--circle" title="sound">
-                            // 						<svg aria-label="sound" class="AssemblyIcon AssemblyIcon--small" role="img">
-                            // 							<noscript></noscript>
-                            // 							<use xlink:href="#audio"></use>
-                            // 							<noscript></noscript>
-                            // 						</svg>
-                            // 					</button>
-                            // 				</div>
-                            // 			</div>
-                            // 			<div class="w1ssq2st c1chmkuz"></div>
-                            // 			<div class="w1ssq2st r2l768d">
-                            // 				<div class="r1lq0pkj"></div>
-                            // 			</div>
-                            // 		</div>
-                            // 	</div>
-                            // 	<div class="t1ix05zv" data-testid="Question Text" style="--t1ix05zv-0:auto;">
-                            // 		<div class="t1gujtze c1sj1twu">
-                            // 			<div aria-label="London, England" class="FormattedText notranslate FormattedTextWithImage-wrapper lang-en" style="font-size: 20px;">
-                            // 				<div style="display: block;">London, England</div>
-                            // 			</div>
-                            // 			<div class="FormattedTextWithImage-wrapper i172n7x2">
-                            // 				<div class="Image z1fffk20">
-                            // 					<div class="ZoomableImage">
-                            // 						<img alt="" class="ZoomableImage-rawImage">
-                            // 						</div>
-                            // 						<div class="Image-image" style="background-image: url(&quot;https://o.quizlet.com/B4AeM6KLJYPVyRmA8DRk2g_m.jpg&quot;); background-position: center center; background-repeat: no-repeat; height: 104px; width: 104px; background-size: cover;"></div>
-                            // 					</div>
-                            // 				</div>
-                            // 			</div>
-                            // 		</div>
-                            // 	</div>
-                            //</div>
-
-                    //WRITING QUESTION NO PHOTO EXAMPLE
-                        //<div class="qjwdgny">
-                            // 	<div class="a5hy006">
-                            // 		<div class="w1ssq2st grq2jtf">
-                            // 			<div class="w1ssq2st hhz8wgl">
-                            // 				<div class="w1ssq2st l1dr47li">
-                            // 					<section class="l1qy775d">Definition</section>
-                            // 					<div class="as9ks2b">
-                            // 						<button type="button" aria-label="sound" class="AssemblyButtonBase AssemblyIconButton AssemblyIconButton--tertiary AssemblyIconButton--circle AssemblyButtonBase--small AssemblyButtonBase--circle" title="sound">
-                            // 							<svg aria-label="sound" class="AssemblyIcon AssemblyIcon--small" role="img">
-                            // 								<noscript></noscript>
-                            // 								<use xlink:href="#audio"></use>
-                            // 								<noscript></noscript>
-                            // 							</svg>
-                            // 						</button>
-                            // 					</div>
-                            // 				</div>
-                            // 				<div class="w1ssq2st c1chmkuz"></div>
-                            // 				<div class="w1ssq2st r2l768d">
-                            // 					<div class="r1lq0pkj"></div>
-                            // 				</div>
-                            // 			</div>
-                            // 		</div>
-                            // 		<div class="t1ix05zv" data-testid="Question Text" style="--t1ix05zv-0:auto;">
-                            // 			<div class="t1gujtze c1sj1twu">
-                            // 				<div aria-label="Femur" class="FormattedText notranslate FormattedTextWithImage-wrapper lang-en" style="font-size: 20px;">
-                            // 					<div style="display: block;">Femur</div>
-                            // 				</div>
-                            // 			</div>
-                            // 		</div>
-                            // 	</div>
-
-                    //this can be a .ScrollableViewLayout (writing question)
-                    
-                    else if (currentClass.includes("FeedbackViewContent")) {
-                        //this can be a .FeedbackViewContent ("study this one")
-                        //ignore
-                    }
-                    else if (currentClass.includes("FlashcardQuestionView-flashcardWrapper")) {
-                        //flashcard, ignore
-                    }
-                }
-                else if (currentClass.includes("MultipleChoiceQuestionPrompt")) {
-                    //this is the standard question, continue with this easy
-                    checkFlashcard();
-
-                    //FLASHCARD EXAMPLE
-                        //<article aria-live="polite" class="szaclz8 s1t6zpc1" style="--s1t6zpc1-3:0; --s1t6zpc1-13: initial;">
-                            // <div class="a5hy006">
-                            // 	<div class="w1ssq2st grq2jtf">
-                            // 		<div class="w1ssq2st hhz8wgl">
-                            // 			<div class="w1ssq2st l1dr47li">
-                            // 				<section class="l1qy775d">Definition</section>
-                            // 				<div class="as9ks2b">
-                            // 					<button type="button" aria-label="sound" class="AssemblyButtonBase AssemblyIconButton AssemblyIconButton--tertiary AssemblyIconButton--circle AssemblyButtonBase--small AssemblyButtonBase--circle" title="sound">
-                            // 						<svg aria-label="sound" class="AssemblyIcon AssemblyIcon--small" role="img">
-                            // 							<noscript></noscript>
-                            // 							<use xlink:href="#audio"></use>
-                            // 							<noscript></noscript>
-                            // 						</svg>
-                            // 					</button>
-                            // 				</div>
-                            // 			</div>
-                            // 			<div class="w1ssq2st c1chmkuz"></div>
-                            // 			<div class="w1ssq2st r2l768d">
-                            // 				<div class="r1lq0pkj"></div>
-                            // 				<div class="r1r0iyl2">
-                            // 					<div>
-                            // 						<section class="fuzysan">
-                            // 							<img alt="Report this question" srcset="https://assets.quizlet.com/a/j/dist/app/i/learning_assistant/flag.d36c67607d3916d.png, https://assets.quizlet.com/a/j/dist/app/i/learning_assistant/flag@2x.dd91583cc983fcd.png 2x">
-                            // 							</section>
-                            // 						</div>
-                            // 					</div>
-                            // 				</div>
-                            // 			</div>
-                            // 		</div>
-                            // 		<div class="t1ix05zv" data-testid="Question Text" style="--t1ix05zv-0:auto;">
-                            // 			<div class="t1gujtze c1sj1twu">
-                            // 				<div aria-label="Streets of Philadelphia (If you got this wrong you're dead to me)" class="FormattedText notranslate FormattedTextWithImage-wrapper lang-en" style="font-size: 20px;">
-                            // 					<div style="display: block;">Streets of Philadelphia (If you got this wrong you're dead to me)</div>
-                            // 				</div>
-                            // 				<div class="FormattedTextWithImage-wrapper i172n7x2">
-                            // 					<div class="Image z1fffk20">
-                            // 						<div class="ZoomableImage">
-                            // 							<img alt="" class="ZoomableImage-rawImage">
-                            // 							</div>
-                            // 							<div class="Image-image" style="background-image: url(&quot;https://o.quizlet.com/d0mNXQCAkkvw9lyoM1nH.w_m.jpg&quot;); background-position: center center; background-repeat: no-repeat; height: 104px; width: 104px; background-size: cover;"></div>
-                            // 						</div>
-                            // 					</div>
-                            // 				</div>
-                            // 			</div>
-                            // 		</div>
-                            // 		<div class="a1xw9zoj">
-                            // 			<section aria-label="Choose matching term" class="lv624w6">
-                            // 				<div aria-hidden="true">Choose matching term</div>
-                            // 			</section>
-                            // 			<div class="a1ik211e" data-testid="MCQ Answers">
-                            // 				<section class="wbkjose" tabindex="0">
-                            // 					<div>
-                            // 						<div class="k17vky9d">1</div>
-                            // 					</div>
-                            // 					<div aria-selected="false" class="t1vgx2mw" data-testid="option-1">
-                            // 						<div class="c1sj1twu">
-                            // 							<div aria-label="Which musical, based on Romeo &amp; Juliet, was a 1960s Oscar winner." class="FormattedText notranslate FormattedTextWithImage-wrapper lang-en">Which musical, based on Romeo &amp; Juliet, was a 1960s Oscar winner.</div>
-                            // 						</div>
-                            // 					</div>
-                            // 				</section>
-                            // 				<section class="wbkjose" tabindex="0">
-                            // 					<div>
-                            // 						<div class="k17vky9d">2</div>
-                            // 					</div>
-                            // 					<div aria-selected="false" class="t1vgx2mw" data-testid="option-2">
-                            // 						<div class="c1sj1twu">
-                            // 							<div aria-label="Where does Fred Flintstone work? Extra point if you can name his boss." class="FormattedText notranslate FormattedTextWithImage-wrapper lang-en">Where does Fred Flintstone work? Extra point if you can name his boss.</div>
-                            // 						</div>
-                            // 					</div>
-                            // 				</section>
-                            // 				<section class="wbkjose" tabindex="0">
-                            // 					<div>
-                            // 						<div class="k17vky9d">3</div>
-                            // 					</div>
-                            // 					<div aria-selected="false" class="t1vgx2mw" data-testid="option-3">
-                            // 						<div class="c1sj1twu">
-                            // 							<div aria-label="Which American snack food is rumored to be able to survive a nuclear attack?" class="FormattedText notranslate FormattedTextWithImage-wrapper lang-en">Which American snack food is rumored to be able to survive a nuclear attack?</div>
-                            // 						</div>
-                            // 					</div>
-                            // 				</section>
-                            // 				<section class="wbkjose" tabindex="0">
-                            // 					<div>
-                            // 						<div class="k17vky9d">4</div>
-                            // 					</div>
-                            // 					<div aria-selected="false" class="t1vgx2mw" data-testid="option-4">
-                            // 						<div class="c1sj1twu">
-                            // 							<div aria-label="Which 1994 song earned Bruce Springsteen an Academy Award for Best Original Song?" class="FormattedText notranslate FormattedTextWithImage-wrapper lang-en">Which 1994 song earned Bruce Springsteen an Academy Award for Best Original Song?</div>
-                            // 						</div>
-                            // 					</div>
-                            // 				</section>
-                            // 			</div>
-                            // 		</div>
-                            // 	</article>
-                }
-                else if (currentClass.includes("FlashcardQuestionView-flashcardWrapper")) {
-                    
-                }
-                else if (currentClass.includes("ScrollableViewLayout")) {
-                    
-                }
-                
-                else if (currentClass.includes("CheckpointView")) {
-                    
-                }
-                else if (currentClass.includes("EndView")) {
-                    //they finished the set, it's over
-                }*/
             }
             else {
-                console.log("Flashcard change ignored. Service not running yet.");
+                console.log("service not running");
             }
         }
 
-        //for the learn page
-        $('.StudyModesLayout .cz3cbvv .lw557v3').on('DOMSubtreeModified', function(e){
-            checkLearnView();
-        });
-
-        //for the write page
-
-
-        //DETECT CURRENT FLASHCARD INFO
         var previousText;
         var flashCardAnswer;
-        function checkFlashcard() {
-            console.log("checking flashcard...");
 
-            //check if flashcard is shown, in comparison to a "wrong answer" panel
+        // used to compare strings when there is no exact match
+        // https://stackoverflow.com/a/36566052
 
-            //if ($('.LearnViewController').find( ".MultipleChoiceQuestionPrompt" ).length == 0) {
-            //    console.log("not a flashcard!");
-            //    return;
-            //}
+        // for name sake
+        function levenshtein(a, b) {
+            return similarity(a, b);
+        }
 
-            //fetch text
-            var flashCardText = $(".a5hy006 .FormattedText").text();
-            console.log(flashCardText);
+        function similarity(s1, s2) {
+            var longer = s1;
+            var shorter = s2;
+            if (s1.length < s2.length) {
+              longer = s2;
+              shorter = s1;
+            }
+            var longerLength = longer.length;
+            if (longerLength == 0) {
+              return 1.0;
+            }
+            return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+        }
 
+        function editDistance(s1, s2) {
+            s1 = s1.toLowerCase();
+            s2 = s2.toLowerCase();
+          
+            var costs = new Array();
+            for (var i = 0; i <= s1.length; i++) {
+              var lastValue = i;
+              for (var j = 0; j <= s2.length; j++) {
+                if (i == 0)
+                  costs[j] = j;
+                else {
+                  if (j > 0) {
+                    var newValue = costs[j - 1];
+                    if (s1.charAt(i - 1) != s2.charAt(j - 1))
+                      newValue = Math.min(Math.min(newValue, lastValue),
+                        costs[j]) + 1;
+                    costs[j - 1] = lastValue;
+                    lastValue = newValue;
+                  }
+                }
+              }
+              if (i > 0)
+                costs[s2.length] = lastValue;
+            }
+            return costs[s2.length];
+        }
+
+        function checkMultipleChoice() {
+            upArrowListen = false;
+
+            // get question...
+            let question = $("div[data-testid='Question Text']");
+            console.log("question:", question);
+
+            // let questionText = question.find(".FormattedText").text();
+            let questionHTML = question.find(".FormattedText div");
+
+            // replace <br> with \n
+            // let questionText = questionHTML[0].innerText;
+            let questionText = questionHTML.html().replace(/<br>/g, " \n");
+
+            // console.log("questionText: " + questionText)
+            // print questionText as raw text to console
+            // that means \n will be printed as \n
+            // and not as a new line
+            // console.log("questionTexti: " + questionText)
+            console.log("questionText:", {
+                "0": questionText
+            })
+
+            let flashCardText = questionText;
+
+            // find all possible matching terms
+            let terms = $("div[data-testid='MCQ Answers'] section");
+            let termTexts = [];
+            let termTextsAnswers = [];
+            let differences = [];
+            
+            $.each(terms, function(key, index) {
+                let termHTML = $(this).find(".FormattedText");
+                let termText = termHTML.html().replace(/<br>/g, "\n");
+                termTexts.push(termText);
+                let answer = findOther(termText);
+                termTextsAnswers.push(answer);
+                
+                // compare answer to questionText
+                // let diff = JsDiff.diffChars(questionText, answer);
+                if (answer == null) {
+                    differences.push(0);
+                    return;
+                }
+                else {
+                    let diffNum = similarity(questionText, answer);
+                    differences.push(diffNum);
+                }
+            });
+
+            console.log("termTexts", termTexts);
+            console.log("termTextsAnswers", termTextsAnswers);
+            console.log("differences", differences);
+
+            // find highest similarity
+            let highest = 0;
+            let highestIndex = 0;
+            $.each(differences, function(key, index) {
+                if (index > highest) {
+                    highest = index;
+                    highestIndex = key;
+                }
+            });
+
+            // print highest similarity termText, termTextAnswer, and difference
+            console.log("highest:", {
+                "termText": termTexts[highestIndex],
+                "termTextAnswer": termTextsAnswers[highestIndex],
+                "questionText": questionText,
+                "difference": differences[highestIndex]
+            });
+
+            // they are sections within div[data-testid='MCQ Answers']
+            // each section has a div with class "FormattedText" that contains the text
+
+            // find the correct answer
+            
+
+            // add a class to the correct answer
+            
+            
+            //check if flashcard content exists in set
+            //THIS IS WHERE THE SETTINGS CHECK WOULD COME IN HANDY
+            var flashCardAnswer = findOther(flashCardText);
+            if (flashCardAnswer == null) {
+                // if highest similarity is less than 0.5, then return
+                if (differences[highestIndex] < 0.5) {
+                    console.log("err");
+                    return;
+                }
+                
+                // select highest similarity termText
+                console.log("fallback")
+                flashCardAnswer = termTexts[highestIndex];
+                
+                // console.log("err");
+                // return;
+            }
+            
+            //ALL CLEAR BOYS, THE TERM HAS BEEN FOUND
+            console.log("flashCardAnswer:", flashCardAnswer);
+            
             //check if flashcard content actually changed!
             if (previousText == flashCardText) {
                 console.log("duplicate");
-                return;
+                // return;
+            }
+            else {
+                popup(flashCardText + "::" + flashCardAnswer);
             }
             previousText = flashCardText;
+            //send popup
+
+            // check if flashCardAnswer is in termTexts
+            // if it is, add a class to the correct answer
+            if (termTexts.includes(flashCardAnswer)) {
+                // find the correct answer
+                console.log("back check good");
+            }
+
+            // use index of answer with highest similarity to add class
+            console.log("highestIndex:", highestIndex);
+            let correctAnswer = $("div[data-testid='MCQ Answers'] section:eq(" + highestIndex + ")");
+            console.log("correctAnswer:", correctAnswer);
+
+            // let correctAnswer = $("div[data-testid='MCQ Answers'] .FormattedText:contains('" + flashCardAnswer + "')");
+            correctAnswer.addClass("rightAnswer");
+
+        }
+
+        function checkWriting() {
+
+            // get question...
+            let question = $("div[data-testid='Question Text']");
+            console.log("question:", question);
+
+            // let questionText = question.find(".FormattedText").text();
+            let questionHTML = question.find(".FormattedText div");
+
+            // replace <br> with \n
+            // let questionText = questionHTML[0].innerText;
+            let questionText = questionHTML.html().replace(/<br>/g, "\n");
+
+            // console.log("questionText: " + questionText)
+            // print questionText as raw text to console
+            // that means \n will be printed as \n
+            // and not as a new line
+            // console.log("questionTexti: " + questionText)
+            console.log("questionText:", {
+                "0": questionText
+            })
+
+            let flashCardText = questionText;
+
+
+            //fetch text
+            // var flashCardText = $(".a5hy006 .FormattedText").text();
+            // if (flashCardText == "") {
+            //     flashCardText = $(".FixedQuestionLayout-content .FormattedTextWithImage div").text();
+            // }
+            console.log(flashCardText);
 
             //check if flashcard content exists in set
             //THIS IS WHERE THE SETTINGS CHECK WOULD COME IN HANDY
-            if (findOther(flashCardText) == null) {
+            flashCardAnswer = findOtherBestMatch(flashCardText);
+            if (flashCardAnswer == null) {
                 console.log("err");
                 return;
             }
 
             //ALL CLEAR BOYS, THE TERM HAS BEEN FOUND
-            flashCardAnswer = findOther(flashCardText);
-
-            //send popup
-            popup(flashCardText + "::" + flashCardAnswer);
-
-            //find correct button element
-            //.MultipleChoiceQuestionPrompt-termOptions class contains divs with divs with divs with text
-            //4th div contains text
-            $("div[data-testid='MCQ Answers'] .FormattedText").each(function() {
-                if ($(this).html() == flashCardAnswer) {
-                    $(this).parent().parent().parent().addClass("rightAnswer");
-                }
-            });
-
-        }
-
-
-        function checkMultipleChoice() {
-            upArrowListen = false;
-        }
-
-        function checkWriting() {
-            //fetch text
-            var flashCardText = $(".a5hy006 .FormattedText").text();
-            if (flashCardText == "") {
-                flashCardText = $(".FixedQuestionLayout-content .FormattedTextWithImage div").text();
-            }
-            console.log(flashCardText);
+            console.log(flashCardAnswer);
 
             //check if flashcard content actually changed!
             if (previousText == flashCardText) {
                 console.log("duplicate");
                 //return;
             }
+            else {
+
+                currentCharCount = 0;
+                popup(flashCardText + "::" + flashCardAnswer);
+            }
             previousText = flashCardText;
 
-            //check if flashcard content exists in set
-            //THIS IS WHERE THE SETTINGS CHECK WOULD COME IN HANDY
-            if (findOther(flashCardText) == null) {
-                console.log("err");
-                return;
-            }
-
-            //ALL CLEAR BOYS, THE TERM HAS BEEN FOUND
-            flashCardAnswer = findOther(flashCardText);
-            console.log(flashCardAnswer);
 
             //send popup
-            popup(flashCardText + "::" + flashCardAnswer);
 
             //enable listening
             upArrowListen = true;
-            currentCharCount = 0;
+
+            // add span w/ correct answer to input
+            //label.AssemblyInput
+            let parentAppned = $("label.AssemblyInput");
+
+            // check if div.correctAnswer already exists
+            if (parentAppned.find("div.correctAnswer").length > 0) {
+                return;
+            }
+
+            // else...
+            let span = $("<div>").attr({
+                "class": "correctAnswer"
+            }).append(
+                $("<span>").text("").addClass("typed"),
+                $("<span>").text("").addClass("restOf")
+            )
+            parentAppned.append(span);
+            updatePlaceholder();
+
         }
 
         var upArrowListen = false;
@@ -429,104 +493,172 @@ $(document).ready(function() {
         let inputSelector = ".AssemblyInput-input";
         let inputContainerSelector = ".StudyModesLayout";
 
-        $(inputContainerSelector).on("keyup", inputSelector, function(e) {
-            // console.log("key press detected");
-            // console.log(e.keyCode);
-            // //ADDING LETTERS
-            // if ((e.keyCode >= 65 && e.keyCode <= 90) || e.keyCode == 32) {
-            //     if (upArrowListen) {
-            //         e.preventDefault();
-            //         currentCharCount += (currentCharCount < flashCardAnswer.length) ? 1 : 0;
-            //         console.log(currentCharCount);
-            //         $(inputSelector).val(flashCardAnswer.substr(0,currentCharCount));
-            //     }
-            //     else {
-            //         console.log("should not be listening");
-            //     }
-            // }
+        let prevInputText = "";
 
-            if ((e.keyCode >= 65 && e.keyCode <= 90) || e.keyCode == 32) {
-                console.log("key press detected");
-                console.log(e.keyCode);
-                //ADDING LETTERS
+        function updatePlaceholder() {
+            let formattedFlashcardAnswer = flashCardAnswer.replace(/\n/g, " ");
 
-                if (upArrowListen) {
-                    console.log("current input:" + $(inputSelector).val());
-                    currentCharCount += (currentCharCount < flashCardAnswer.length) ? 1 : 0;
-                    console.log(currentCharCount);
+            let input = $(inputSelector);
+            let inputText = input.val();
+            let inputLength;
+            let typed = "";
+            let restOf = "";
 
-                    let localCharCount =  JSON.parse(JSON.stringify(currentCharCount));
-                    
-                    $(inputSelector).val(flashCardAnswer.substr(0,currentCharCount)).change();
-
-                    console.log("updated input! "+ $(inputSelector).val());
-
-                    //update it again, just for fun. but only if you haven't typed yet again!
-                    setTimeout(function() {
-                        if (currentCharCount == localCharCount) {
-                            $(inputSelector).val(flashCardAnswer.substr(0,currentCharCount)).change();
-                        }
-                    },100);
-                }
-                else {
-                    console.log("should not be listening");
-                }
-            }
-        });
-
-        $(inputContainerSelector).on("keydown", inputSelector, function(e) {
-            //check keypress limit
-            //PRESSING ENTER
-            if (e.keyCode == 13 && upArrowListen) {
-                currentCharCount = 0;
-                upArrowListen = false;
-                e.preventDefault();
-                $(this).blur();
-
-                let buttonElement = ".a151psh7 button[type='submit']";
-
-                $(buttonElement).focus();
-                $(buttonElement).click();
-            }
-            else if (e.key == "Backspace") {
-                //backspace;
-                currentCharCount--;
-                currentCharCount = currentCharCount < 0 ? 0 : currentCharCount;
-            }
-            else if (currentCharCount >= flashCardAnswer.length && upArrowListen) {
-                e.preventDefault();
-                console.log("you've typed it all. stop man");
-                console.log("before "+ $(inputSelector).val());
-                //and just to be sure?
-                $(inputSelector).val(flashCardAnswer);
-
-                //to be sure to be sure
-                setTimeout(function() {
-                    console.log("after "+ $(inputSelector).val());
-                },100);
+            if (inputText.length == 0) {
+                // input.attr("placeholder", formattedFlashcardAnswer);
+                // don't change, it's too obvious
+                input.attr("placeholder", "Type the answer");
             }
             else {
+                inputLength = inputText.length;
+                typed = formattedFlashcardAnswer.substring(0, inputLength);
+                restOf = formattedFlashcardAnswer.substring(inputLength);
+            }
+
+            let typedSpan = $(".correctAnswer .typed");
+            let restOfSpan = $(".correctAnswer .restOf");
+            typedSpan.text(typed);
+            restOfSpan.text(restOf);
+        }
+
+        function selectAnswer() {
+            let answerButton = $("form button[type='submit']");
+            $("").blur();
+            $(answerButton).focus();
+        }
+        
+        $(inputContainerSelector).on("input", inputSelector, function(e) {
+            if (!upArrowListen) {
                 return;
             }
+
+            let currInputText = $(inputSelector).val();
+
+
+            // edit answer
+            let newFlashcardAnswer = flashCardAnswer.replace(/\n/g, " ");
+            flashCardAnswer = newFlashcardAnswer;
+
+            // console.log("input detected");
+            // console.log("typed: " + currInputText);
+            // console.log("change from last: " + (currInputText.length - prevInputText.length));
+            let totLength = flashCardAnswer.length;
+            let typedLength = currInputText.length;
+
+            if (typedLength > totLength) {
+                console.log("too long");
+                $(inputSelector).val(flashCardAnswer);
+                selectAnswer();
+                return;
+            }
+
+            if (currInputText == flashCardAnswer) {
+                // console.log("correct");
+                upArrowListen = false;
+                $(inputSelector).val(flashCardAnswer);
+                // focus on "answer" button.
+                selectAnswer();
+                return;
+            }
+
+            if (currInputText == flashCardAnswer.substr(0, typedLength)) {
+                // console.log("correct so far");
+                updatePlaceholder();
+                return;
+            }
+
+            // typed wrong. intercept and replace
+            console.log("wrong");
+            $(inputSelector).val(flashCardAnswer.substr(0, typedLength));
+            updatePlaceholder();
+            
+            prevInputText = currInputText;
         });
 
         //FIND ID FROM TEXT IN QUIZLET ARRAY
         //text = string, textordefinition = "word" or "definiton"
         function findOther(text) {
+            // console.log(termObj);
+
             var index = termObj.findIndex(obj=> obj.def==text);
             if (index == -1) {
-            var index = termObj.findIndex(obj=> obj.term==text);
-            if (index == -1) {
-                console.log("could not find matching text in set!");
-                return null;
+                var index = termObj.findIndex(obj=> obj.term==text);
+
+                if (index == -1) {
+                    console.log("could not find matching text in set!");
+                    return null;
+                }
+                else {
+                    return termObj[index].def;
+                }
             }
             else {
-                return termObj[index].def;
+                return termObj[index].term;
             }
+        }
+
+        function findOtherBestMatch(text) {
+            let closestThreshold = 0.5;
+
+            function findClosest(text, list) {
+                var closest = list[0];
+                var closestIndex = 0;
+                var closestDist = levenshtein(text, closest);
+                let outObj = {};
+                for (var i = 1; i < list.length; i++) {
+                    var dist = levenshtein(text, list[i]);
+                    if (dist > closestDist) {
+                        closestDist = dist;
+                        closest = list[i];
+                        closestIndex = i;
+                    }
+                    outObj[i] = {
+                        "d": dist,
+                        "text": list[i]
+                    };
+                }
+                console.log(outObj);
+
+                console.log("closest: " + closest + " dist: " + closestDist + " index: " + closestIndex)
+
+                // threshold met?
+                if (closestDist < closestThreshold) {
+                    return -1;
+                }
+                return closestIndex;
             }
+
+            // determine if text is a term or definition (only called in writing mode)
+            let defCheck = $(".StudyModesLayout article section:contains('Definition')");
+            if (defCheck.length > 0) {
+                console.log("def check")
+                // text is a definition
+                let termList = termObj.map(obj => obj.def);
+                console.log(termList);
+                let testClosestIndex = findClosest(text, termList);
+
+                if (testClosestIndex == -1) {
+                    return null;
+                }
+                else {
+                    return termObj[testClosestIndex].term;
+                }
+            }
+
             else {
-            return termObj[index].term;
+                console.log("term check")
+                // try as a term
+                let defList = termObj.map(obj => obj.term);
+                let testClosestIndex = findClosest(text, defList);
+
+                if (testClosestIndex == -1) {
+                    return null;
+                }
+                else {
+                    return termObj[testClosestIndex].def;
+                }
             }
+
         }
     });
     

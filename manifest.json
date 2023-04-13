@@ -10,8 +10,8 @@
 		"128":"128x128.png"
 	},
 	"short_name":"Q++",
-	"version":"1.3",
-	"version_name":"Beta Build 3",
+	"version":"1.5.1",
+	"version_name":"Beta Build 5",
 	"permissions": [
 		"activeTab"
 	],
@@ -27,6 +27,12 @@
 				"https://quizlet.com/*/write"
 			],
 			"js": ["jquery_3.4.1_slim_min.js","write-inject1.js","write.js"]
+		},
+		{
+			"matches": [
+				"https://quizlet.com/*/match"
+			],
+			"js": ["jquery_3.4.1_slim_min.js","match-inject1.js","match.js"]
 		}
 	],
 	"web_accessible_resources": [
@@ -35,9 +41,12 @@
 			"resources": [ "learn-inject2.js" ]
 		},
 		{
-			
 			"matches": [ "https://*/*" ],
 			"resources": ["write-inject2.js"]
+		},
+		{
+			"matches": [ "https://*/*" ],
+			"resources": ["match-inject2.js"]
 		}
 	]
 }

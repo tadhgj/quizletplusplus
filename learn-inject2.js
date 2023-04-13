@@ -165,8 +165,9 @@ newNode.innerHTML = `<p id='convenientCode' style='display:none'>`+JSON.stringif
 <style>
   .quizletpluspluspopupcontainer {
 	pointer-events:none;
-	position:absolute;
-	bottom:0px;
+	position:fixed;
+	z-index:999;
+	bottom:10px;
 	right:0px;
 	width:300px;
 	height:800px;
@@ -183,6 +184,27 @@ newNode.innerHTML = `<p id='convenientCode' style='display:none'>`+JSON.stringif
   }
   .rightAnswer:hover {
 	border:.125rem dashed #ffcd1f;
+  }
+  div.correctAnswer {
+    position: absolute;
+    bottom: 11px;
+    left: 16px;
+    font-weight: 600;
+    height: 26px;
+	width: calc(100% - 32px);
+	white-space: pre;
+    pointer-events: none;
+	display:flex;
+  }
+  .correctAnswer .typed {
+	opacity:0;
+  }
+  .correctAnswer .restOf {
+	background: -webkit-linear-gradient(180deg, #fefefe, #ccc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+	display:block;
+	width:100%;
   }
 </style>
   `;
