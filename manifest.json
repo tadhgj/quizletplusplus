@@ -37,16 +37,8 @@
 	],
 	"web_accessible_resources": [
 		{
-			"matches": [ "https://*/*" ],
-			"resources": [ "learn-inject2.js" ]
-		},
-		{
-			"matches": [ "https://*/*" ],
-			"resources": ["write-inject2.js"]
-		},
-		{
-			"matches": [ "https://*/*" ],
-			"resources": ["match-inject2.js"]
+			"matches": [ "https://quizlet.com/*" ],
+			"resources": [ "learn-inject2.js", "write-inject2.js", "match-inject2.js" ]
 		}
 	]
 }
