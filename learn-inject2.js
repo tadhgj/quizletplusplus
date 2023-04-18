@@ -206,6 +206,12 @@ newNode.innerHTML = `<p id='convenientCode' style='display:none'>`+JSON.stringif
 	display:block;
 	width:100%;
   }
+
+   /* handle dark mode */
+   .theme-night .quizletpluspluspopup {
+	background:rgba(255,255,255,0.5);
+	color:white;
+   }
 </style>
   `;
 

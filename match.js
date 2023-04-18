@@ -95,9 +95,9 @@ $(document).ready(function() {
 
         //on update of MatchModeQuestionScatterBoard, do something
         $(".MatchModeLayout").on("mouseover",".MatchModeQuestionScatterTile", function() {
-            console.log($(this))
+            // console.log($(this))
             let currText = $(this)[0].textContent;
-            console.log(currText);
+            // console.log(currText);
 
             let other = findOther(currText);
 
@@ -112,13 +112,21 @@ $(document).ready(function() {
             });
         });
 
-        $(".MatchModeLayout").on("mouseexit",".MatchModeQuestionScatterTile", function() {
-            $(".MatchModeQuestionScatterBoard .MatchModeQuestionScatterTile").removeClass("rightAnswerAlways");
+        $(".MatchModeLayout").on("mouseout",".MatchModeQuestionScatterTile", function() {
+            console.log("mouseOut");
+            if (!lockOn) {
+                $(".MatchModeQuestionScatterBoard .MatchModeQuestionScatterTile").removeClass("rightAnswerAlways");
+            }
         });
+
+        let lockOn = false;
 
         // when dragging something
         $(".MatchModeLayout").on("mousedown",".MatchModeQuestionScatterTile", function() {
-            console.log("dragging")
+            console.log("dragging");
+
+            // lock in the highlighted thing until mouseup
+            lockOn = true;
             $(".MatchModeQuestionScatterBoard .MatchModeQuestionScatterTile").removeClass("rightAnswerAlways");
 
             let currText = $(this)[0].textContent;
@@ -136,6 +144,13 @@ $(document).ready(function() {
                 }
             });
         });
+
+        // let go
+        $(".MatchModeLayout").on("mouseup",".MatchModeQuestionScatterTile", function() {
+            console.log("let go");
+            lockOn = false;
+        });
+
 
         //FIND ID FROM TEXT IN QUIZLET ARRAY
         //text = string, textordefinition = "word" or "definiton"
