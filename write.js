@@ -36,7 +36,7 @@ $(document).ready(function() {
     termObj = JSON.parse($("#convenientCode").html());
   }
 
-  //CUSTOM POPUP MESSAGE (grey, transparent in the bottom right, inspired by GTA mod menus)
+  //CUSTOM POPUP MESSAGE
   var nextPopupBoxId = 0;
   function popup(text) {
     var tempId = nextPopupBoxId;
@@ -223,40 +223,6 @@ $(document).ready(function() {
   });
 
   //
-
-  /*$('.WriteViewController').on("keydown", ".AutoExpandTextarea-textarea", function(e) {
-    console.log("key press detected: '"+e.key+ "' has been pressed");
-    //ADDING LETTERS
-    if ((e.keyCode >= 48 && e.keyCode <= 90) || e.keyCode == 32) {
-      console.log("count = "+currentCharCount+"/"+flashCardAnswer.length);
-      if (upArrowListen) {
-        if (currentCharCount < flashCardAnswer.length) {
-          currentCharCount++;
-          $(".AutoExpandTextarea-textarea").val(flashCardAnswer.substr(0,currentCharCount));
-          e.preventDefault();
-          //var f = $.Event('keypress', { keyCode: 69 });
-          //$(".AutoExpandTextarea-textarea").keypress(f);
-        }
-        else {
-          console.log("stop typing! you're done!!! stop!!");
-          $(".AutoExpandTextarea-textarea").val(flashCardAnswer.substr(0,currentCharCount));
-          e.preventDefault();
-        }
-      }
-      else {
-        console.log("should not be listening");
-      }
-    }
-    //PRESSING ENTER
-    if (e.keyCode == 13) {
-      currentCharCount = 0;
-      upArrowListen = false;
-    }
-    else {
-      return;
-    }
-  });*/
-
   //SEPARATE ON KEYUP FOR BACKSPACES
   $(".LearnModeMain").on("keyup", "#user-answer", function(e) {
     //REMOVING LETTERS
@@ -265,6 +231,105 @@ $(document).ready(function() {
       currentCharCount = $(".AutoExpandTextarea-textarea").val().length;
     }
   });
+
+  
+
+  // new
+  let inputContainerSelector = $(".AutoExpandTextarea-textarea");
+  $(inputContainerSelector).on("input", inputSelector, function(e) {
+    if (!upArrowListen) {
+        return;
+    }
+
+    let currInputText = $(inputSelector).val();
+
+
+    // edit answer
+    let newFlashcardAnswer = flashCardAnswer.replace(/\n/g, " ");
+    flashCardAnswer = newFlashcardAnswer;
+
+    // console.log("input detected");
+    // console.log("typed: " + currInputText);
+    // console.log("change from last: " + (currInputText.length - prevInputText.length));
+    let totLength = flashCardAnswer.length;
+    let typedLength = currInputText.length;
+
+    if (typedLength > totLength) {
+        console.log("too long");
+        $(inputSelector).val(flashCardAnswer);
+        selectAnswer();
+        return;
+    }
+
+    if (currInputText == flashCardAnswer) {
+        // console.log("correct");
+        upArrowListen = false;
+        $(inputSelector).val(flashCardAnswer);
+        // focus on "answer" button.
+        selectAnswer();
+        return;
+    }
+
+    if (currInputText == flashCardAnswer.substr(0, typedLength)) {
+        // console.log("correct so far");
+        updatePlaceholder();
+        return;
+    }
+
+    // typed wrong. intercept and replace
+    console.log("wrong");
+    $(inputSelector).val(flashCardAnswer.substr(0, typedLength));
+    updatePlaceholder();
+    
+    prevInputText = currInputText;
+  });
+
+
+
+  function levenshtein(a, b) {
+            return similarity(a, b);
+        }
+
+        function similarity(s1, s2) {
+            var longer = s1;
+            var shorter = s2;
+            if (s1.length < s2.length) {
+              longer = s2;
+              shorter = s1;
+            }
+            var longerLength = longer.length;
+            if (longerLength == 0) {
+              return 1.0;
+            }
+            return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+        }
+
+        function editDistance(s1, s2) {
+            s1 = s1.toLowerCase();
+            s2 = s2.toLowerCase();
+          
+            var costs = new Array();
+            for (var i = 0; i <= s1.length; i++) {
+              var lastValue = i;
+              for (var j = 0; j <= s2.length; j++) {
+                if (i == 0)
+                  costs[j] = j;
+                else {
+                  if (j > 0) {
+                    var newValue = costs[j - 1];
+                    if (s1.charAt(i - 1) != s2.charAt(j - 1))
+                      newValue = Math.min(Math.min(newValue, lastValue),
+                        costs[j]) + 1;
+                    costs[j - 1] = lastValue;
+                    lastValue = newValue;
+                  }
+                }
+              }
+              if (i > 0)
+                costs[s2.length] = lastValue;
+            }
+            return costs[s2.length];
+        }
 
 
 
@@ -286,4 +351,114 @@ $(document).ready(function() {
       return termObj[index].term;
     }
   }
+
+  function levenshtein(a, b) {
+    return similarity(a, b);
+  }
+
+  function similarity(s1, s2) {
+    var longer = s1;
+    var shorter = s2;
+    if (s1.length < s2.length) {
+      longer = s2;
+      shorter = s1;
+    }
+    var longerLength = longer.length;
+    if (longerLength == 0) {
+      return 1.0;
+    }
+    return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+  }
+
+  function editDistance(s1, s2) {
+    s1 = s1.toLowerCase();
+    s2 = s2.toLowerCase();
+  
+    var costs = new Array();
+    for (var i = 0; i <= s1.length; i++) {
+      var lastValue = i;
+      for (var j = 0; j <= s2.length; j++) {
+        if (i == 0)
+          costs[j] = j;
+        else {
+          if (j > 0) {
+            var newValue = costs[j - 1];
+            if (s1.charAt(i - 1) != s2.charAt(j - 1))
+              newValue = Math.min(Math.min(newValue, lastValue),
+                costs[j]) + 1;
+            costs[j - 1] = lastValue;
+            lastValue = newValue;
+          }
+        }
+      }
+      if (i > 0)
+        costs[s2.length] = lastValue;
+    }
+    return costs[s2.length];
+  }
+
+  // new
+  function findOtherBestMatch(text) {
+    let closestThreshold = 0.5;
+
+    function findClosest(text, list) {
+        var closest = list[0];
+        var closestIndex = 0;
+        var closestDist = levenshtein(text, closest);
+        let outObj = {};
+        for (var i = 1; i < list.length; i++) {
+            var dist = levenshtein(text, list[i]);
+            if (dist > closestDist) {
+                closestDist = dist;
+                closest = list[i];
+                closestIndex = i;
+            }
+            outObj[i] = {
+                "d": dist,
+                "text": list[i]
+            };
+        }
+        console.log(outObj);
+
+        console.log("closest: " + closest + " dist: " + closestDist + " index: " + closestIndex)
+
+        // threshold met?
+        if (closestDist < closestThreshold) {
+            return -1;
+        }
+        return closestIndex;
+    }
+
+    // determine if text is a term or definition (only called in writing mode)
+    let defCheck = $(".StudyModesLayout article section:contains('Definition')");
+    if (defCheck.length > 0) {
+        console.log("def check")
+        // text is a definition
+        let termList = termObj.map(obj => obj.def);
+        console.log(termList);
+        let testClosestIndex = findClosest(text, termList);
+
+        if (testClosestIndex == -1) {
+            return null;
+        }
+        else {
+            return termObj[testClosestIndex].term;
+        }
+    }
+
+    else {
+        console.log("term check")
+        // try as a term
+        let defList = termObj.map(obj => obj.term);
+        let testClosestIndex = findClosest(text, defList);
+
+        if (testClosestIndex == -1) {
+            return null;
+        }
+        else {
+            return termObj[testClosestIndex].def;
+        }
+    }
+
+}
 });

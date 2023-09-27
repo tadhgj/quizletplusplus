@@ -203,7 +203,7 @@ $(document).ready(function() {
                     return;
                 }
 
-                
+
                 // 3: written question
                 let writtenTest = $('.StudyModesLayout article').find("label.AssemblyInput");
 
@@ -238,12 +238,12 @@ $(document).ready(function() {
             var longer = s1;
             var shorter = s2;
             if (s1.length < s2.length) {
-              longer = s2;
-              shorter = s1;
+                longer = s2;
+                shorter = s1;
             }
             var longerLength = longer.length;
             if (longerLength == 0) {
-              return 1.0;
+                return 1.0;
             }
             return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
         }
@@ -251,26 +251,26 @@ $(document).ready(function() {
         function editDistance(s1, s2) {
             s1 = s1.toLowerCase();
             s2 = s2.toLowerCase();
-          
+
             var costs = new Array();
             for (var i = 0; i <= s1.length; i++) {
-              var lastValue = i;
-              for (var j = 0; j <= s2.length; j++) {
-                if (i == 0)
-                  costs[j] = j;
-                else {
-                  if (j > 0) {
-                    var newValue = costs[j - 1];
-                    if (s1.charAt(i - 1) != s2.charAt(j - 1))
-                      newValue = Math.min(Math.min(newValue, lastValue),
-                        costs[j]) + 1;
-                    costs[j - 1] = lastValue;
-                    lastValue = newValue;
-                  }
+                var lastValue = i;
+                for (var j = 0; j <= s2.length; j++) {
+                    if (i == 0)
+                        costs[j] = j;
+                    else {
+                        if (j > 0) {
+                            var newValue = costs[j - 1];
+                            if (s1.charAt(i - 1) != s2.charAt(j - 1))
+                                newValue = Math.min(Math.min(newValue, lastValue),
+                                    costs[j]) + 1;
+                            costs[j - 1] = lastValue;
+                            lastValue = newValue;
+                        }
+                    }
                 }
-              }
-              if (i > 0)
-                costs[s2.length] = lastValue;
+                if (i > 0)
+                    costs[s2.length] = lastValue;
             }
             return costs[s2.length];
         }
@@ -305,14 +305,14 @@ $(document).ready(function() {
             let termTexts = [];
             let termTextsAnswers = [];
             let differences = [];
-            
-            $.each(terms, function(key, index) {
+
+            $.each(terms, function (key, index) {
                 let termHTML = $(this).find(".FormattedText");
                 let termText = termHTML.html().replace(/<br>/g, "\n");
                 termTexts.push(termText);
                 let answer = findOther(termText);
                 termTextsAnswers.push(answer);
-                
+
                 // compare answer to questionText
                 // let diff = JsDiff.diffChars(questionText, answer);
                 if (answer == null) {
@@ -332,7 +332,7 @@ $(document).ready(function() {
             // find highest similarity
             let highest = 0;
             let highestIndex = 0;
-            $.each(differences, function(key, index) {
+            $.each(differences, function (key, index) {
                 if (index > highest) {
                     highest = index;
                     highestIndex = key;
@@ -351,11 +351,11 @@ $(document).ready(function() {
             // each section has a div with class "FormattedText" that contains the text
 
             // find the correct answer
-            
+
 
             // add a class to the correct answer
-            
-            
+
+
             //check if flashcard content exists in set
             //THIS IS WHERE THE SETTINGS CHECK WOULD COME IN HANDY
             var flashCardAnswer = findOther(flashCardText);
@@ -365,18 +365,18 @@ $(document).ready(function() {
                     console.log("err");
                     return;
                 }
-                
+
                 // select highest similarity termText
                 console.log("fallback")
                 flashCardAnswer = termTexts[highestIndex];
-                
+
                 // console.log("err");
                 // return;
             }
-            
+
             //ALL CLEAR BOYS, THE TERM HAS BEEN FOUND
             console.log("flashCardAnswer:", flashCardAnswer);
-            
+
             //check if flashcard content actually changed!
             if (previousText == flashCardText) {
                 console.log("duplicate");
