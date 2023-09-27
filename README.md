@@ -9,8 +9,9 @@ This is a chrome extension that helps students quickly complete Quizlet activiti
 
 ### Working Features
 * Highlights (on mouse hover) the correct answer in a multiple choice question in **Learn mode**.
+* Highlights (on mouse hover) the correct answer in a multiple choice question in **Match mode**.
 * Intercepts and replaces keypresses to spell out the correct answer in a written question in Learn mode.
-* Has a button to activate the service (which is constantly broken on Quizlet page design refreshes)
+* Has a button to activate the service
 * Has a popup system that indicates when the service has been activated, or detected a flashcard match.
 
 ### Description of the inner works
@@ -27,12 +28,10 @@ Either the correct flashcard is indicated when hovered over, or the keypresses t
 * Test mode is added
 * Work with flashcards that don't contain text
 * How to handle when two flashcards have the exact same text content. (Duplicates that results in only one flashcard match being utilized)
-* There's probably a better way to intercept keypresses, as currently it's sluggish and often undercounts spammed keypresses.
 
 #### Why the github has been created.
 Why don't I keep this code private? It's mine, right?
 Someone left a review on the Chrome extension, saying that he wished the code was on github. This is for you. BTW, you can steal the code of any chrome extension by using the GetCRX extension or something along those lines.
 
 #### PS
-Unfortunately, searching for quizlet++ in the chrome extension search bar doesn't actually find the extension. This is likely due to "+" characters being special in the search function, or ignored entirely. It's easier to search "quizlet" and scroll until you find it.
-If you like the extension, leaving a review is pretty cool. It means that my extension is more likely to show up first when you search for quizlet extensions. 
+If you like the extension, leaving a review is pretty cool. It means that my extension is more likely to show up first when you search for quizlet extensions. If it's broken, you have the right to leave a bad review, but if you could instead contact me, I should fix it pretty quick!
