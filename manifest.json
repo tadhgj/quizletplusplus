@@ -10,27 +10,27 @@
 		"128":"128x128.png"
 	},
 	"short_name":"Q++",
-	"version":"1.5.1",
-	"version_name":"Beta Build 5",
+	"version":"1.6.0",
+	"version_name":"Beta Build 6",
 	"permissions": [
 		"activeTab"
 	],
 	"content_scripts": [
 		{
 			"matches": [
-				"https://quizlet.com/*/learn"
+				"https://quizlet.com/*/learn*"
 			],
 			"js": ["jquery_3.4.1_slim_min.js","learn-inject1.js","combined.js"]
 		},
 		{
 			"matches": [
-				"https://quizlet.com/*/write"
+				"https://quizlet.com/*/write*"
 			],
 			"js": ["jquery_3.4.1_slim_min.js","write-inject1.js","write.js"]
 		},
 		{
 			"matches": [
-				"https://quizlet.com/*/match"
+				"https://quizlet.com/*/match*"
 			],
 			"js": ["jquery_3.4.1_slim_min.js","match-inject1.js","match.js"]
 		}
