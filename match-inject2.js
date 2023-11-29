@@ -1,17 +1,103 @@
-console.log(window.Quizlet["matchModeData"].terms);
+// Get the script element by its ID
+var scriptElement = document.getElementById("__NEXT_DATA__");
+
+// Extract the content of the script element
+var scriptContent = scriptElement.textContent;
+
+// Parse the content as JSON
+var jsonData = JSON.parse(scriptContent);
+
+console.log("Json data:", jsonData)
+console.log(jsonData.props.pageProps.dehydratedReduxStateKey)
+
+// this is a list of all cards...
+var datadata = JSON.parse(jsonData.props.pageProps.dehydratedReduxStateKey);
+console.log(datadata)
+
+datadata = datadata.studyModesCommon.studiableData.studiableItems;
+console.log(datadata)
+
+// console.log(window.Quizlet["matchModeData"].terms);
 var termsSmall = [];
 
 //this should be a list
-let studyItems = window.Quizlet["matchModeData"].terms;
+// let studyItems = window.Quizlet["matchModeData"].terms;
+let studyItems = datadata;
+
+// for (let card of studyItems) {
+// 	//useful variables to take...
+// 	//self explanatory
+// 	let cardID = card.id;
+
+// 	let word = card.word;
+
+// 	let definition = card.definition;
+
+// 	console.log({
+// 		"id":cardID,
+// 		"term":word,
+// 		"def":definition,
+// 	});
+
+// 	termsSmall.push(
+// 		{
+// 			"id":cardID,
+// 			"term":word,
+// 			"def":definition,
+// 		}
+// 	);
+
+// }
 
 for (let card of studyItems) {
 	//useful variables to take...
 	//self explanatory
 	let cardID = card.id;
 
-	let word = card.word;
+	//word and definition
+	let cardSidesMap = card.cardSides.map(e => e.label);
 
-	let definition = card.definition;
+
+	//WORD
+	//(check if this fails!)
+	if (cardSidesMap.indexOf("word") == -1) {
+		//we have a problem
+		console.log("skipping card... no word")
+		console.log(card);
+		continue;
+	}
+	//now map the media of this card side...
+	let wordMediaMap = card.cardSides[cardSidesMap.indexOf("word")].media.map(e => e.type);
+	// console.log(wordMediaMap);
+	//now find index 1...
+	if (wordMediaMap.indexOf(1) == -1) {
+		//we have a problem
+		console.log("skipping card... no word type 1 media")
+		console.log(card, wordMediaMap);
+		continue;
+	}
+	let word = card.cardSides[cardSidesMap.indexOf("word")].media[wordMediaMap.indexOf(1)].plainText;
+
+
+	//definition (check if this also fails)
+	if (cardSidesMap.indexOf("definition") == -1) {
+		//we have a problem
+		console.log("skipping card... no definition")
+		console.log(card);
+		continue;
+	}
+
+	//now map the media of this card side...
+	let defMediaMap = card.cardSides[cardSidesMap.indexOf("definition")].media.map(e => e.type);
+	// console.log(defMediaMap);
+	//now find index 1...
+	if (defMediaMap.indexOf(1) == -1) {
+		//we have a problem
+		console.log("skipping card... no def type 1 media")
+		console.log(card, defMediaMap);
+		continue;
+	}
+	let definition = card.cardSides[cardSidesMap.indexOf("definition")].media[defMediaMap.indexOf(1)].plainText;
 
 	console.log({
 		"id":cardID,
@@ -26,6 +112,7 @@ for (let card of studyItems) {
 			"def":definition,
 		}
 	);
+
 
 }
 
@@ -94,7 +181,8 @@ newNode.innerHTML = `<p id='convenientCode' style='display:none'>`+JSON.stringif
 
 // Get the reference node
 setTimeout(function(){
-	var referenceNode = document.querySelector('.ModeLayout');
+	// var referenceNode = document.querySelector('.ModeLayout');
+	var referenceNode = document.querySelector('.cvmjmph');
 	
 	// Insert the new node before the reference node
 	referenceNode.after(newNode);
