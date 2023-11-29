@@ -1,4 +1,21 @@
-console.log(window.Quizlet["assistantModeData"].studiableDocumentData.studiableItems);
+
+// Get the script element by its ID
+var scriptElement = document.getElementById("__NEXT_DATA__");
+
+// Extract the content of the script element
+var scriptContent = scriptElement.textContent;
+
+// Parse the content as JSON
+var jsonData = JSON.parse(scriptContent);
+
+console.log("Json data:", jsonData)
+console.log(jsonData.props.pageProps.studyModesCommon.studiableDocumentData.studiableItems)
+
+// this is a list of all cards...
+var datadata = jsonData.props.pageProps.studyModesCommon.studiableDocumentData.studiableItems;
+console.log(datadata)
+
+// console.log(window.Quizlet["assistantModeData"].studiableDocumentData.studiableItems);
 var termsSmall = [];
 
 //notes 8/4/2022
@@ -81,7 +98,8 @@ var termsSmall = [];
 
 
 //this should be a list
-let studyItems = window.Quizlet["assistantModeData"].studiableDocumentData.studiableItems;
+// let studyItems = window.Quizlet["assistantModeData"].studiableDocumentData.studiableItems;
+let studyItems = datadata
 
 for (let card of studyItems) {
 	//useful variables to take...
