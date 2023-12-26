@@ -1,6 +1,5 @@
 {
-"update_url": "https://clients2.google.com/service/update2/crx",
-
+	"update_url": "https://clients2.google.com/service/update2/crx",
 	"name":"Quizlet++",
     "manifest_version":3,
 	"description": "Extension that modifies Quizlet for more \"features\".",
@@ -12,9 +11,6 @@
 	"short_name":"Q++",
 	"version":"1.6.0",
 	"version_name":"Beta Build 6",
-	"permissions": [
-		"activeTab"
-	],
 	"content_scripts": [
 		{
 			"matches": [
