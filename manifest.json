@@ -9,8 +9,8 @@
 		"128":"128x128.png"
 	},
 	"short_name":"Q++",
-	"version":"1.7.0",
-	"version_name":"Beta Build 7",
+	"version":"1.8.0",
+	"version_name":"Beta Build 8",
 	"content_scripts": [
 		{
 			"matches": [
@@ -26,6 +26,12 @@
 		},
 		{
 			"matches": [
+				"https://quizlet.com/*/spell*"
+			],
+			"js": ["jquery_3.4.1_slim_min.js","spell-inject1.js","spell.js"]
+		},
+		{
+			"matches": [
 				"https://quizlet.com/*/match*"
 			],
 			"js": ["jquery_3.4.1_slim_min.js","match-inject1.js","match.js"]
@@ -34,7 +40,7 @@
 	"web_accessible_resources": [
 		{
 			"matches": [ "https://quizlet.com/*" ],
-			"resources": [ "learn-inject2.js", "write-inject2.js", "match-inject2.js" ]
+			"resources": [ "learn-inject2.js", "write-inject2.js", "match-inject2.js", "spell-inject2.js"]
 		}
 	]
 }

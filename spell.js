@@ -49,7 +49,7 @@ $(document).ready(function() {
 
   //FIRE ON FLASHCARD CHANGE
   var serviceRunning = false;
-  $('.WriteViewController').on('DOMSubtreeModified', function(){
+  $('.ModeLayout').on('DOMSubtreeModified', function(){
     if (serviceRunning) {
       console.log("flashcard changed. checking element now");
       checkFlashcard();
@@ -58,15 +58,18 @@ $(document).ready(function() {
       console.log("Flashcard change did nothing. Service not running yet.")
     }
   });
+  
+  let questionHTMLSelector = ".UIDiv.SpellQuestionView-inputPrompt--plain";
 
   //writing
   function checkWriting() {
     // get question...
-    let question = $("div[data-testid='Question Text']");
+    let question = $(".UIDiv.SpellQuestionView");
     console.log("question:", question);
 
     // let questionText = question.find(".FormattedText").text();
-    let questionHTML = question.find(".FormattedText div");
+    let questionHTML = question.find(questionHTMLSelector);
+    console.log("questionHTML:", questionHTML);
 
     // replace <br> with \n
     // let questionText = questionHTML[0].innerText;
@@ -120,39 +123,71 @@ $(document).ready(function() {
     //enable listening
     upArrowListen = true;
 
-    // add span w/ correct answer to input
-    //label.AssemblyInput
-    let parentAppned = $("label.AssemblyInput");
-
-    // check if div.correctAnswer already exists
-    if (parentAppned.find("div.correctAnswer").length > 0) {
-        return;
-    }
-
-    // else...
-    let span = $("<div>").attr({
-        "class": "correctAnswer"
-    }).append(
-        $("<span>").text("").addClass("typed"),
-        $("<span>").text("").addClass("restOf")
-    )
-    parentAppned.append(span);
     updatePlaceholder();
 
   }
+
+
+  function updatePlaceholder() {
+
+      // add span w/ correct answer to input
+      //label.AssemblyInput
+      let parentAppned = $("div.AutoExpandTextarea-wrapper");
+
+      // check if div.correctAnswer already exists
+      if (parentAppned.find("div.correctAnswer").length > 0) {
+        console.log("correctAnswer already exists");
+        // console.log($(".correctAnswer").length());
+          return;
+      }
+
+      // else...
+      let span = $("<div>").attr({
+          "class": "correctAnswer"
+      }).append(
+          $("<span>").text("").addClass("typed"),
+          $("<span>").text("").addClass("restOf")
+      )
+      parentAppned.append(span);
+
+      let formattedFlashcardAnswer = flashCardAnswer.replace(/\n/g, " ");
+
+      let input = $(inputSelector);
+      let inputText = input.val();
+      let inputLength;
+      let typed = "";
+      let restOf = "";
+
+      if (inputText.length == 0) {
+          // input.attr("placeholder", formattedFlashcardAnswer);
+          // don't change, it's too obvious
+          input.attr("placeholder", "Type what you hear");
+      }
+      else {
+          inputLength = inputText.length;
+          typed = formattedFlashcardAnswer.substring(0, inputLength);
+          restOf = formattedFlashcardAnswer.substring(inputLength);
+      }
+
+      let typedSpan = $(".correctAnswer .typed");
+      let restOfSpan = $(".correctAnswer .restOf");
+      typedSpan.text(typed);
+      restOfSpan.text(restOf);
+  }
+
 
   //DETECT CURRENT FLASHCARD INFO
   var previousText;
   var flashCardAnswer;
   function checkFlashcard() {
     //check if flashcard is shown, in comparison to a "wrong answer" panel
-    if ($('.ModeLayout-content').find( ".FormattedText div" ).length == 0) {
+    if ($('.ModeLayout-content').find(questionHTMLSelector).length == 0) {
       console.log("not a flashcard!");
       return;
     }
 
     //fetch text
-    var flashCardText = $(".ModeLayout-content .FormattedText div").text();
+    var flashCardText = $(".ModeLayout-content "+ questionHTMLSelector).text();
     console.log(flashCardText);
 
     //check if flashcard content actually changed!
@@ -183,44 +218,44 @@ $(document).ready(function() {
   //DETECT KEYDOWNS
   var upArrowListen = false;
   var currentCharCount = 0;
-  $('.WriteViewController').on("keyup", ".AutoExpandTextarea-textarea", function(e) {
-    console.log("key press detected");
-    console.log(e.keyCode);
-    //ADDING LETTERS
-    if ((e.keyCode >= 65 && e.keyCode <= 90) || e.keyCode == 32) {
-      if (upArrowListen) {
-        currentCharCount += (currentCharCount < flashCardAnswer.length) ? 1 : 0;
-        console.log(currentCharCount);
-        $(".AutoExpandTextarea-textarea").val(flashCardAnswer.substr(0,currentCharCount));
-        e.preventDefault();
-      }
-      else {
-        console.log("should not be listening");
-      }
-    }
-  });
+  // $('.SpellViewController').on("keyup", ".AutoExpandTextarea-textarea", function(e) {
+  //   console.log("key press detected");
+  //   console.log(e.keyCode);
+  //   //ADDING LETTERS
+  //   if ((e.keyCode >= 65 && e.keyCode <= 90) || e.keyCode == 32) {
+  //     if (upArrowListen) {
+  //       currentCharCount += (currentCharCount < flashCardAnswer.length) ? 1 : 0;
+  //       console.log(currentCharCount);
+  //       $(".AutoExpandTextarea-textarea").val(flashCardAnswer.substr(0,currentCharCount));
+  //       e.preventDefault();
+  //     }
+  //     else {
+  //       console.log("should not be listening");
+  //     }
+  //   }
+  // });
 
-  $(".WriteViewController").on("keydown", ".AutoExpandTextarea-textarea", function(e) {
-    //check keypress limit
-    //PRESSING ENTER
-    if (e.keyCode == 13 && upArrowListen) {
-      currentCharCount = 0;
-      upArrowListen = false;
-      e.preventDefault();
-      $(this).blur();
-      $(".WriteViewController .TypeTheAnswerField-actions button").focus();
-      $(".WriteViewController .TypeTheAnswerField-actions button").click();
-    }
-    else if (currentCharCount >= flashCardAnswer.length && upArrowListen) {
-      e.preventDefault();
-      console.log("you've typed it all. stop man");
-      //and just to be sure?
-      $(".AutoExpandTextarea-textarea").val(flashCardAnswer);
-    }
-    else {
-      return;
-    }
-  });
+  // $(".SpellViewController").on("keydown", ".AutoExpandTextarea-textarea", function(e) {
+  //   //check keypress limit
+  //   //PRESSING ENTER
+  //   // if (e.keyCode == 13 && upArrowListen) {
+  //   //   currentCharCount = 0;
+  //   //   upArrowListen = false;
+  //   //   e.preventDefault();
+  //   //   $(this).blur();
+  //   //   $(".SpellViewController .TypeTheAnswerField-actions button").focus();
+  //   //   $(".SpellViewController .TypeTheAnswerField-actions button").click();
+  //   // }
+  //   // else if (currentCharCount >= flashCardAnswer.length && upArrowListen) {
+  //     e.preventDefault();
+  //     console.log("you've typed it all. stop man");
+  //     //and just to be sure?
+  //     $(".AutoExpandTextarea-textarea").val(flashCardAnswer);
+  //   // }
+  //   // else {
+  //     // return;
+  //   // }
+  // });
 
   //
   //SEPARATE ON KEYUP FOR BACKSPACES
@@ -234,9 +269,8 @@ $(document).ready(function() {
 
   
 
-  // new
-  let inputContainerSelector = $(".AutoExpandTextarea-textarea");
-  $(inputContainerSelector).on("input", inputSelector, function(e) {
+  function checkInputOnTextarea(element) {
+    // console.log("checking input on textarea...");
     if (!upArrowListen) {
         return;
     }
@@ -282,7 +316,66 @@ $(document).ready(function() {
     updatePlaceholder();
     
     prevInputText = currInputText;
-  });
+
+  }
+
+
+  function selectAnswer() {
+      $("").blur();
+  }
+  
+  // new
+  // wait until this this element is available
+  let inputContainerSelector = ".StudyModesLayout";
+  let inputSelector = ".AutoExpandTextarea-textarea";
+  if ($(inputSelector).length == 0) {
+    // start listening for this element
+    // listen on .site DOM changes
+    let observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        console.log("checking mutation for text area...")
+        // check if the element is available
+        if ($(inputSelector).length > 0) {
+          // stop listening
+          if (observer != null) {
+            observer.disconnect();
+          }
+          observer = null;
+          // start listening for input
+          console.log("found input element!")
+          // $(inputContainerSelector).on("input", inputSelector, function(e) {
+          //   checkInputOnTextarea(inputSelector);
+          // });
+          startListeningForInput();
+
+        }
+      });
+    });
+
+    observer.observe(document.querySelector(".site"), {
+      childList: true,
+      subtree: true
+    });
+
+  }
+  else {
+    console.log("found input element!")
+    // if (observer != null) {
+    //   observer.disconnect();
+    // }
+    // $(inputContainerSelector).on("input", inputSelector, function(e) {
+    //   checkInputOnTextarea(inputSelector);
+    // });
+    startListeningForInput();
+  }
+
+  function startListeningForInput() {
+    // start listening for input
+    console.log($(inputSelector).length);
+    $(inputContainerSelector).on("input", inputSelector, function(e) {
+      checkInputOnTextarea(inputSelector);
+    });
+  }
 
 
 
@@ -430,8 +523,8 @@ $(document).ready(function() {
     }
 
     // determine if text is a term or definition (only called in writing mode)
-    let defCheck = $(".StudyModesLayout article section:contains('Definition')");
-    if (defCheck.length > 0) {
+    // let defCheck = $(".StudyModesLayout article section:contains('Definition')");
+    // if (defCheck.length > 0) {
         console.log("def check")
         // text is a definition
         let termList = termObj.map(obj => obj.def);
@@ -439,26 +532,26 @@ $(document).ready(function() {
         let testClosestIndex = findClosest(text, termList);
 
         if (testClosestIndex == -1) {
-            return null;
+
+            console.log("no match for definition... term check")
+            // try as a term
+            let defList = termObj.map(obj => obj.term);
+            let testClosestIndex = findClosest(text, defList);
+
+            if (testClosestIndex == -1) {
+                return null;
+            }
+            else {
+                return termObj[testClosestIndex].def;
+            }
         }
         else {
             return termObj[testClosestIndex].term;
         }
-    }
+    // }
 
-    else {
-        console.log("term check")
-        // try as a term
-        let defList = termObj.map(obj => obj.term);
-        let testClosestIndex = findClosest(text, defList);
-
-        if (testClosestIndex == -1) {
-            return null;
-        }
-        else {
-            return termObj[testClosestIndex].def;
-        }
-    }
+    // else {
+    // }
 
 }
 });
