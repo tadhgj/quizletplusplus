@@ -9,8 +9,8 @@
 		"128":"128x128.png"
 	},
 	"short_name":"Q++",
-	"version":"1.8.0",
-	"version_name":"Beta Build 8",
+	"version":"1.9.0",
+	"version_name":"Beta Build 9",
 	"content_scripts": [
 		{
 			"matches": [

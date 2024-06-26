@@ -20,20 +20,6 @@ $(document).ready(function() {
         });
     }
 
-    //DEBUG
-    // $('.StudyModesLayout').on('DOMSubtreeModified', function(e){
-    //     // print out class and name of  element that changed
-    //     console.log("DOM MODIFY:",e,e.target.className, e.target.nodeName);
-
-    //     // notes:
-    //     // from wrong answer to another flashcard...
-    //     // DOM MODIFY: lw557v3 DIV
-    // });
-
-    // I want to listen for DOMSubtreeModified, and want to fire a function after a burst of changes
-    // so I want to wait for a burst of changes to stop, and then fire a function
-
-
     waitForElm("#convenientCode").then((elm) => {
         console.log("combined.js active...");
         //DOM setup
@@ -41,11 +27,8 @@ $(document).ready(function() {
         //add Quizlet++ button
         $(".anbpm9l").prepend(`<div class='o1c0xcc3'><button class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding AssemblyButtonBase--border quizletplusplusbutton" type="button" style="margin-right:16px">Q++</button></div>`);
 
-        //add debug button
-        // $(".anbpm9l").prepend(`<div class='o1c0xcc3'><button class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding AssemblyButtonBase--border quizletplusplusdbutton" type="button" style="margin-right:16px">Debug</button></div>`);
-
-        //remove free trial button
-        //$(".TopNavigation-contentRight .TopNavigationItem:eq(1)").remove();
+        // find span with text 'Get unlimited access', and remove the third parent
+        $(".StudyModesLayout div.c8mixic span:contains('Get unlimited access')").parent().parent().parent().remove();
         
         //add Quizlet++ popup container
         $(".StudyModesLayout").append("<div class='quizletpluspluspopupcontainer'></div>");
@@ -71,12 +54,6 @@ $(document).ready(function() {
             }
         });
 
-        // ON CLICK OF DEBUG BUTTON
-        // $(".site").on("click",".quizletplusplusdbutton", function() {
-        //     console.log("Debug Button Click");
-        //     checkLearnView();
-        // });
-
         //COLLECT TERM DATA FROM PAGE (Using HTML because of limitations with chrome extensions and their lack of ability in accessing window objects because they're run in a "secure bullshitty thing")
         var termObj;
         function collectTermData() {
@@ -101,7 +78,7 @@ $(document).ready(function() {
 
         $('.StudyModesLayout').on('DOMSubtreeModified', DOMthing);
 
-
+        let prevQuestionText = "";
         let prevTimestampDom = 0;
         let threshold = 1000;
         let timeoutList = [];
@@ -113,59 +90,30 @@ $(document).ready(function() {
                 return;
             }
             
-            
-            console.log(e);
-            console.log("DOMthing");
+            // attempt to do this without relying on the auto-generated class names
+            // .StudyModesLayout article div[data-testid='Question Text'] - this gets 
 
-            //valid ends
+            // check if question text is present
+            if ($(".StudyModesLayout article div[data-testid='Question Text']").length != 0) {
+                // console.log("question text")
+                qtext = $(".StudyModesLayout article div[data-testid='Question Text']").text();
 
-            // flashcard to MCQ
-            // lw557v3
-            // lw557v3
-            // reyok18
+                // check dupe
+                if (qtext == prevQuestionText) {
+                    return;
+                }
+                // check empty
+                if (qtext == "") {
+                    return;
+                }
+                prevQuestionText = qtext;
+                console.log(qtext);
 
-            // MCQ to MCQ
-            // m1crz3gf
-            // lw557v3
-            // lw557v3
-
-            // writing to writing
-            // a13cru74
-            // a13cru74
-            // a13cru74
-            // lw557v3
-            // lw557v3
-
-            // writing to MCQ
-            // (ends in)
-            // lw557v3
-            // lw557v3
-            // reyok18
-
-            // MCQ to writing
-
-            let target2 = e.target.className;
-            console.log(target2);
-
-            if (target2 != "lw557v3" && target2 != "reyok18") {
+                checkLearnView();
                 return;
             }
-            checkLearnView();
 
-
-            // console.log(e);
-            // let currTime = Date.now();
-            // prevTimestampDom = currTime;
-
-            // timeoutList.push(setTimeout(function() {
-            //     if (Date.now() - prevTimestampDom >= threshold) {
-            //         console.log("DOMthing() fired");
-            //         checkLearnView();
-            //     }
-            //     else {
-            //         console.log("DOMthing() not fired");
-            //     }
-            // }, threshold));
+            return;
         }
 
         function checkLearnView() {
@@ -214,7 +162,7 @@ $(document).ready(function() {
                 }
 
                 // 4: other test
-                console.log("too far");
+                // console.log("");
                 return;
 
             }
@@ -275,30 +223,21 @@ $(document).ready(function() {
             return costs[s2.length];
         }
 
+
+        var prevMultipleChoiceText = "";
         function checkMultipleChoice() {
             upArrowListen = false;
 
-            // get question...
-            let question = $("div[data-testid='Question Text']");
-            console.log("question:", question);
-
-            // let questionText = question.find(".FormattedText").text();
-            let questionHTML = question.find(".FormattedText div");
-
-            // replace <br> with \n
-            // let questionText = questionHTML[0].innerText;
-            let questionText = questionHTML.html().replace(/<br>/g, " \n");
-
-            // console.log("questionText: " + questionText)
-            // print questionText as raw text to console
-            // that means \n will be printed as \n
-            // and not as a new line
-            // console.log("questionTexti: " + questionText)
-            console.log("questionText:", {
-                "0": questionText
-            })
+            // multipleChoice would not have been called if this was null or empty
+            let questionText = $(".StudyModesLayout article div[data-testid='Question Text']").text();
+            // check anyways
+            if (!questionText || questionText == "") {
+                return;
+            }
 
             let flashCardText = questionText;
+
+            // the logic below is not the best. whatever
 
             // find all possible matching terms
             let terms = $("div[data-testid='MCQ Answers'] section");
@@ -308,9 +247,10 @@ $(document).ready(function() {
 
             $.each(terms, function (key, index) {
                 let termHTML = $(this).find(".FormattedText");
-                let termText = termHTML.html().replace(/<br>/g, "\n");
+                // let termText = termHTML.html().replace(/<br>/g, "\n");
+                let termText = termHTML.text();
                 termTexts.push(termText);
-                let answer = findOther(termText);
+                let answer = findOther(termText); // searches for exact match
                 termTextsAnswers.push(answer);
 
                 // compare answer to questionText
@@ -325,9 +265,9 @@ $(document).ready(function() {
                 }
             });
 
-            console.log("termTexts", termTexts);
-            console.log("termTextsAnswers", termTextsAnswers);
-            console.log("differences", differences);
+            // console.log("termTexts", termTexts);
+            // console.log("termTextsAnswers", termTextsAnswers);
+            // console.log("differences", differences);
 
             // find highest similarity
             let highest = 0;

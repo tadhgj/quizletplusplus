@@ -4,12 +4,11 @@ $(document).ready(function() {
     //add Quizlet++ button
     $(".TopNavigation-contentRight").prepend(`<div class='TopNavigationItem RightNavigationItem'><button class="AssemblyButtonBase AssemblyIconButton AssemblyIconButton--secondary AssemblyButtonBase--medium quizletplusplusbutton" type="button" style='border-radius:25px;padding:0px 12px;font-family:hurme_no2-webfont;font-kerning: normal;font-size: 14px;font-weight:600;'>Quizlet++</button></div>`);
 
-    //remove free trial button
-    $(".TopNavigation-contentRight .TopNavigationItem:eq(1)").remove();
-    // inside div.TopNavigation-contentRight is a div containing: button:contains("Upgrade")
-    //Upgrade: free 7-day trial
+    //add Quizlet++ button
+    $(".t13kodjj").prepend(`<div class='o1c0xcc3'><button class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding AssemblyButtonBase--border quizletplusplusbutton" type="button" style="margin-right:16px">Q++</button></div>`);
 
-    $(".TopNavigation-contentRight .TopNavigationItem:contains('Upgrade')").remove();
+    // remove ad
+    $(".SiteUpgradeButton").parent().remove()
     
     
     //add Quizlet++ popup container
@@ -67,6 +66,10 @@ $(document).ready(function() {
 
     // let questionText = question.find(".FormattedText").text();
     let questionHTML = question.find(".FormattedText div");
+
+    if (questionHTML.length == 0) {
+      return;
+    }
 
     // replace <br> with \n
     // let questionText = questionHTML[0].innerText;
@@ -157,7 +160,7 @@ $(document).ready(function() {
 
     //check if flashcard content actually changed!
     if (previousText == flashCardText) {
-      console.log("duplicate");
+      // console.log("duplicate");
       return;
     }
     previousText = flashCardText;
@@ -168,9 +171,13 @@ $(document).ready(function() {
       console.log("err");
       return;
     }
+    else {
+      // console.log("all clear");
+    }
 
     //ALL CLEAR BOYS, THE TERM HAS BEEN FOUND
     flashCardAnswer = findOther(flashCardText);
+    // console.log(flashCardAnswer);
 
     //send popup
     popup(flashCardText + "::" + flashCardAnswer);
@@ -180,157 +187,146 @@ $(document).ready(function() {
     currentCharCount = 0;
   }
 
-  //DETECT KEYDOWNS
-  var upArrowListen = false;
-  var currentCharCount = 0;
-  $('.WriteViewController').on("keyup", ".AutoExpandTextarea-textarea", function(e) {
-    console.log("key press detected");
-    console.log(e.keyCode);
-    //ADDING LETTERS
-    if ((e.keyCode >= 65 && e.keyCode <= 90) || e.keyCode == 32) {
-      if (upArrowListen) {
-        currentCharCount += (currentCharCount < flashCardAnswer.length) ? 1 : 0;
-        console.log(currentCharCount);
-        $(".AutoExpandTextarea-textarea").val(flashCardAnswer.substr(0,currentCharCount));
-        e.preventDefault();
-      }
-      else {
-        console.log("should not be listening");
-      }
-    }
-  });
 
-  $(".WriteViewController").on("keydown", ".AutoExpandTextarea-textarea", function(e) {
-    //check keypress limit
-    //PRESSING ENTER
-    if (e.keyCode == 13 && upArrowListen) {
-      currentCharCount = 0;
-      upArrowListen = false;
-      e.preventDefault();
-      $(this).blur();
-      $(".WriteViewController .TypeTheAnswerField-actions button").focus();
-      $(".WriteViewController .TypeTheAnswerField-actions button").click();
-    }
-    else if (currentCharCount >= flashCardAnswer.length && upArrowListen) {
-      e.preventDefault();
-      console.log("you've typed it all. stop man");
-      //and just to be sure?
-      $(".AutoExpandTextarea-textarea").val(flashCardAnswer);
-    }
-    else {
-      return;
-    }
-  });
-
-  //
-  //SEPARATE ON KEYUP FOR BACKSPACES
-  $(".LearnModeMain").on("keyup", "#user-answer", function(e) {
-    //REMOVING LETTERS
-    if (e.keyCode == 8) {
-      console.log("backspace detected");
-      currentCharCount = $(".AutoExpandTextarea-textarea").val().length;
-    }
-  });
-
-  
-
-  // new
-  let inputContainerSelector = $(".AutoExpandTextarea-textarea");
-  $(inputContainerSelector).on("input", inputSelector, function(e) {
-    if (!upArrowListen) {
-        return;
-    }
-
-    let currInputText = $(inputSelector).val();
-
-
-    // edit answer
-    let newFlashcardAnswer = flashCardAnswer.replace(/\n/g, " ");
-    flashCardAnswer = newFlashcardAnswer;
-
-    // console.log("input detected");
-    // console.log("typed: " + currInputText);
-    // console.log("change from last: " + (currInputText.length - prevInputText.length));
-    let totLength = flashCardAnswer.length;
-    let typedLength = currInputText.length;
-
-    if (typedLength > totLength) {
-        console.log("too long");
-        $(inputSelector).val(flashCardAnswer);
-        selectAnswer();
-        return;
-    }
-
-    if (currInputText == flashCardAnswer) {
-        // console.log("correct");
-        upArrowListen = false;
-        $(inputSelector).val(flashCardAnswer);
-        // focus on "answer" button.
-        selectAnswer();
-        return;
-    }
-
-    if (currInputText == flashCardAnswer.substr(0, typedLength)) {
-        // console.log("correct so far");
-        updatePlaceholder();
-        return;
-    }
-
-    // typed wrong. intercept and replace
-    console.log("wrong");
-    $(inputSelector).val(flashCardAnswer.substr(0, typedLength));
-    updatePlaceholder();
+    function waitForElm(selector) {
+        return new Promise(resolve => {
+            if (document.querySelector(selector)) {
+                return resolve(document.querySelector(selector));
+            }
     
-    prevInputText = currInputText;
-  });
-
-
-
-  function levenshtein(a, b) {
-            return similarity(a, b);
-        }
-
-        function similarity(s1, s2) {
-            var longer = s1;
-            var shorter = s2;
-            if (s1.length < s2.length) {
-              longer = s2;
-              shorter = s1;
-            }
-            var longerLength = longer.length;
-            if (longerLength == 0) {
-              return 1.0;
-            }
-            return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
-        }
-
-        function editDistance(s1, s2) {
-            s1 = s1.toLowerCase();
-            s2 = s2.toLowerCase();
-          
-            var costs = new Array();
-            for (var i = 0; i <= s1.length; i++) {
-              var lastValue = i;
-              for (var j = 0; j <= s2.length; j++) {
-                if (i == 0)
-                  costs[j] = j;
-                else {
-                  if (j > 0) {
-                    var newValue = costs[j - 1];
-                    if (s1.charAt(i - 1) != s2.charAt(j - 1))
-                      newValue = Math.min(Math.min(newValue, lastValue),
-                        costs[j]) + 1;
-                    costs[j - 1] = lastValue;
-                    lastValue = newValue;
-                  }
+            const observer = new MutationObserver(mutations => {
+                if (document.querySelector(selector)) {
+                    resolve(document.querySelector(selector));
+                    observer.disconnect();
                 }
-              }
-              if (i > 0)
-                costs[s2.length] = lastValue;
+            });
+    
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        });
+    }
+
+
+    var upArrowListen = false;
+    var currentCharCount = 0;
+    let inputContainerSelector = $(".AutoExpandTextarea-textarea");
+    waitForElm(".AutoExpandTextarea-textarea").then((elm) => {
+      //DETECT KEYDOWNS
+      $('.WriteViewController').on("keyup", ".AutoExpandTextarea-textarea", function(e) {
+        // console.log(e.keyCode);
+        // console.log(e.key)
+        //ADDING LETTERS
+        if ((e.keyCode >= 65 && e.keyCode <= 90) || e.keyCode == 32) {
+          console.log("watched key press detected:" + e.key);
+          if (upArrowListen) {
+            if (flashCardAnswer != null && flashCardAnswer != "") {
+              console.log("flash card answer: "+flashCardAnswer+".")
+              currentCharCount += (currentCharCount < flashCardAnswer.length) ? 1 : 0;
+              console.log(currentCharCount);
+              $(".AutoExpandTextarea-textarea").val(flashCardAnswer.substr(0,currentCharCount));
+              e.preventDefault();
             }
-            return costs[s2.length];
+          }
+          else {
+            console.log("should not be listening");
+          }
+        }
+        else {
+          console.log("out of range to listen to")
+        }
+      });
+
+      $(".WriteViewController").on("keydown", ".AutoExpandTextarea-textarea", function(e) {
+        //check keypress limit
+        //PRESSING ENTER
+        if (e.keyCode == 13 && upArrowListen) {
+          currentCharCount = 0;
+          upArrowListen = false;
+          e.preventDefault();
+          $(this).blur();
+          $(".WriteViewController .TypeTheAnswerField-actions button").focus();
+          $(".WriteViewController .TypeTheAnswerField-actions button").click();
+        }
+        else if (flashCardAnswer != undefined && flashCardAnswer.length > 1 && currentCharCount >= flashCardAnswer.length && upArrowListen) {
+          e.preventDefault();
+          console.log("you've typed it all. stop man");
+          //and just to be sure?
+          $(".AutoExpandTextarea-textarea").val(flashCardAnswer);
+        }
+        else {
+          return;
+        }
+      });
+
+      //
+      //SEPARATE ON KEYUP FOR BACKSPACES
+      $(".LearnModeMain").on("keyup", "#user-answer", function(e) {
+        //REMOVING LETTERS
+        if (e.keyCode == 8) {
+          console.log("backspace detected");
+          currentCharCount = $(".AutoExpandTextarea-textarea").val().length;
+        }
+      });
+
+      
+
+      // wait for ui
+      // new
+      $(inputContainerSelector).on("input", function(e) {
+        if (!upArrowListen) {
+            return;
         }
 
+        let currInputText = $(inputSelector).val();
+
+
+        // edit answer
+        let newFlashcardAnswer = flashCardAnswer.replace(/\n/g, " ");
+        flashCardAnswer = newFlashcardAnswer;
+        if (flashCardAnswer.strip() == "") { // don't stop user from typing if glitched!
+          return;
+        }
+        print("new flashcard answer: " + flashCardAnswer +".")
+
+        // console.log("input detected");
+        // console.log("typed: " + currInputText);
+        // console.log("change from last: " + (currInputText.length - prevInputText.length));
+        let totLength = flashCardAnswer.length;
+        let typedLength = currInputText.length;
+
+        if (typedLength > totLength) {
+            console.log("too long");
+            $(inputSelector).val(flashCardAnswer);
+            selectAnswer();
+            return;
+        }
+
+        if (currInputText == flashCardAnswer) {
+            // console.log("correct");
+            upArrowListen = false;
+            $(inputSelector).val(flashCardAnswer);
+            // focus on "answer" button.
+            selectAnswer();
+            return;
+        }
+
+        if (currInputText == flashCardAnswer.substr(0, typedLength)) {
+            // console.log("correct so far");
+            updatePlaceholder();
+            return;
+        }
+
+        // typed wrong. intercept and replace
+        console.log("wrong");
+        $(inputSelector).val(flashCardAnswer.substr(0, typedLength));
+        updatePlaceholder();
+        
+        prevInputText = currInputText;
+      });
+
+    });
 
 
   //FIND ID FROM TEXT IN QUIZLET ARRAY

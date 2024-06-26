@@ -8,12 +8,12 @@ var scriptContent = scriptElement.textContent;
 // Parse the content as JSON
 var jsonData = JSON.parse(scriptContent);
 
-console.log("Json data:", jsonData)
-console.log(jsonData.props.pageProps.studyModesCommon.studiableDocumentData.studiableItems)
+// console.log("Json data:", jsonData)
+// console.log(jsonData.props.pageProps.studyModesCommon.studiableDocumentData.studiableItems)
 
 // this is a list of all cards...
 var datadata = jsonData.props.pageProps.studyModesCommon.studiableDocumentData.studiableItems;
-console.log(datadata)
+// console.log(datadata)
 
 // console.log(window.Quizlet["assistantModeData"].studiableDocumentData.studiableItems);
 var termsSmall = [];
@@ -117,8 +117,8 @@ for (let card of studyItems) {
 	//(check if this fails!)
 	if (cardSidesMap.indexOf("word") == -1) {
 		//we have a problem
-		console.log("skipping card... no word")
-		console.log(card);
+		// console.log("skipping card... no word")
+		// console.log(card);
 		continue;
 	}
 	//now map the media of this card side...
@@ -127,8 +127,8 @@ for (let card of studyItems) {
 	//now find index 1...
 	if (wordMediaMap.indexOf(1) == -1) {
 		//we have a problem
-		console.log("skipping card... no word type 1 media")
-		console.log(card, wordMediaMap);
+		// console.log("skipping card... no word type 1 media")
+		// console.log(card, wordMediaMap);
 		continue;
 	}
 	let word = card.cardSides[cardSidesMap.indexOf("word")].media[wordMediaMap.indexOf(1)].plainText;
@@ -137,8 +137,8 @@ for (let card of studyItems) {
 	//definition (check if this also fails)
 	if (cardSidesMap.indexOf("definition") == -1) {
 		//we have a problem
-		console.log("skipping card... no definition")
-		console.log(card);
+		// console.log("skipping card... no definition")
+		// console.log(card);
 		continue;
 	}
 
@@ -148,18 +148,18 @@ for (let card of studyItems) {
 	//now find index 1...
 	if (defMediaMap.indexOf(1) == -1) {
 		//we have a problem
-		console.log("skipping card... no def type 1 media")
-		console.log(card, defMediaMap);
+		// console.log("skipping card... no def type 1 media")
+		// console.log(card, defMediaMap);
 		continue;
 	}
 	let definition = card.cardSides[cardSidesMap.indexOf("definition")].media[defMediaMap.indexOf(1)].plainText;
 
-	console.log({
-		"id":cardID,
-		"type":cardType,
-		"term":word,
-		"def":definition,
-	});
+	// console.log({
+	// 	"id":cardID,
+	// 	"type":cardType,
+	// 	"term":word,
+	// 	"def":definition,
+	// });
 
 	termsSmall.push(
 		{
@@ -172,7 +172,7 @@ for (let card of studyItems) {
 
 }
 
-console.log("termsSmall,",termsSmall);
+// console.log("termsSmall,",termsSmall);
 
 
 //create element
@@ -227,18 +227,36 @@ newNode.innerHTML = `<p id='convenientCode' style='display:none'>`+JSON.stringif
 </style>
   `;
 
-// Get the reference node
-setTimeout(function(){
+function waitForElm(selector) {
+    return new Promise(resolve => {
+        if (document.querySelector(selector)) {
+            return resolve(document.querySelector(selector));
+        }
+
+        const observer = new MutationObserver(mutations => {
+            if (document.querySelector(selector)) {
+                observer.disconnect();
+                resolve(document.querySelector(selector));
+            }
+        });
+
+        // If you get "parameter 1 is not of type 'Node'" error, see https://stackoverflow.com/a/77855838/492336
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+}
+
+waitForElm('.StudyModesLayout').then(elm => {
 	var referenceNode = document.querySelector('.StudyModesLayout');
 	
 	// Insert the new node before the reference node
-	referenceNode.after(newNode);
+	referenceNode.after(newNode); // sometimes fails.
 
 	//it aint over until the phat console sings
-	console.log("element added");
-}, 200);//test to see if we can see our precious data
-
-
+	// console.log("element added");
+});
 
 // return;
 // console.log(window.Quizlet["assistantModeData"].studiableData);

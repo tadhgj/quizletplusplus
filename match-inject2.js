@@ -7,15 +7,15 @@ var scriptContent = scriptElement.textContent;
 // Parse the content as JSON
 var jsonData = JSON.parse(scriptContent);
 
-console.log("Json data:", jsonData)
-console.log(jsonData.props.pageProps.dehydratedReduxStateKey)
+// console.log("Json data:", jsonData)
+// console.log(jsonData.props.pageProps.dehydratedReduxStateKey)
 
 // this is a list of all cards...
 var datadata = JSON.parse(jsonData.props.pageProps.dehydratedReduxStateKey);
-console.log(datadata)
+// console.log(datadata)
 
 datadata = datadata.studyModesCommon.studiableData.studiableItems;
-console.log(datadata)
+// console.log(datadata)
 
 // console.log(window.Quizlet["matchModeData"].terms);
 var termsSmall = [];
@@ -23,31 +23,6 @@ var termsSmall = [];
 //this should be a list
 // let studyItems = window.Quizlet["matchModeData"].terms;
 let studyItems = datadata;
-
-// for (let card of studyItems) {
-// 	//useful variables to take...
-// 	//self explanatory
-// 	let cardID = card.id;
-
-// 	let word = card.word;
-
-// 	let definition = card.definition;
-
-// 	console.log({
-// 		"id":cardID,
-// 		"term":word,
-// 		"def":definition,
-// 	});
-
-// 	termsSmall.push(
-// 		{
-// 			"id":cardID,
-// 			"term":word,
-// 			"def":definition,
-// 		}
-// 	);
-
-// }
 
 for (let card of studyItems) {
 	//useful variables to take...
@@ -179,14 +154,33 @@ newNode.innerHTML = `<p id='convenientCode' style='display:none'>`+JSON.stringif
 </style>
   `;
 
-// Get the reference node
-setTimeout(function(){
-	// var referenceNode = document.querySelector('.ModeLayout');
+function waitForElm(selector) {
+    return new Promise(resolve => {
+        if (document.querySelector(selector)) {
+            return resolve(document.querySelector(selector));
+        }
+
+        const observer = new MutationObserver(mutations => {
+            if (document.querySelector(selector)) {
+                observer.disconnect();
+                resolve(document.querySelector(selector));
+            }
+        });
+
+        // If you get "parameter 1 is not of type 'Node'" error, see https://stackoverflow.com/a/77855838/492336
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+}
+
+waitForElm('.cvmjmph').then(elm => {
 	var referenceNode = document.querySelector('.cvmjmph');
 	
 	// Insert the new node before the reference node
-	referenceNode.after(newNode);
+	referenceNode.after(newNode); // sometimes fails.
 
 	//it aint over until the phat console sings
 	console.log("element added");
-}, 200);
+});

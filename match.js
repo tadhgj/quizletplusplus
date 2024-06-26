@@ -26,7 +26,6 @@ $(document).ready(function() {
         //DOM setup
 
         //add Quizlet++ button
-        // $(".TopNavigation-contentRight").prepend(`<div class='TopNavigationItem'><button class="AssemblyButtonBase AssemblyButtonBase--small AssemblyButtonBase--padding quizletplusplusbutton" type="button" style="margin-right:16px">Q++</button></div>`);
         $(".anbpm9l").prepend(`<div class="o1c0xcc3"><button type="button" aria-label="Options" class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding quizletplusplusbutton" style="margin-right: 16px"><span>Q++</span></button></div>`);
 
         
@@ -50,9 +49,6 @@ $(document).ready(function() {
             }
         });
 
-        //ON CLICK OF MATCHPLUSPLUS BUTTON
-
-
         //FIRE ON FLASHCARD CHANGE
         var serviceRunning = false;
 
@@ -74,22 +70,14 @@ $(document).ready(function() {
             },10000);
         }
 
-        // parent:
-        // .b10wn7cm.bpgrkzt
-
-        // each row:
-        // .r1uqswpe (parent)
-        // .r1spra0u ( without padding )
-
         // each item:
         // .n1rw4zro.c1ci68pz.sf3hvof
-
-        // 
 
         //on update of MatchModeQuestionScatterBoard, do something
         // $(".MatchModeLayout").on("mouseover",".MatchModeQuestionScatterTile", function() {
         // $(".b10wn7cm.bpgrkzt").on("mouseover",".n1rw4zro.c1ci68pz.sf3hvof", function() {
-        $(".c12t6xyx").on("mouseover",".n1rw4zro.c1ci68pz.sf3hvof", function() {
+        // $(".c12t6xyx").on("mouseover",".n1rw4zro.c1ci68pz.sf3hvof", function() {
+        $("div.site").on("mouseover",".n1rw4zro.c1ci68pz.sf3hvof", function() {
             // console.log($(this))
             let currText = $(this)[0].textContent;
             console.log(currText);
@@ -98,7 +86,7 @@ $(document).ready(function() {
 
             //find element with answer
             // $(".MatchModeQuestionScatterBoard div.FormattedText").each(function(index) {
-            $(".b10wn7cm.bpgrkzt div.FormattedText").each(function(index) {
+            $("div.FormattedText").each(function(index) {
                 if ($(this).text() == other) {
                     $(this).parent().parent().parent().addClass("rightAnswerAlways");
 
@@ -110,7 +98,8 @@ $(document).ready(function() {
 
         // $(".MatchModeLayout").on("mouseout",".MatchModeQuestionScatterTile", function() {
         // $(".b10wn7cm.bpgrkzt").on("mouseout",".n1rw4zro.c1ci68pz.sf3hvof", function() {
-        $(".c12t6xyx").on("mouseout",".n1rw4zro.c1ci68pz.sf3hvof", function() {
+        // $(".c12t6xyx").on("mouseout",".n1rw4zro.c1ci68pz.sf3hvof", function() {
+        $("div.site").on("mouseout",".n1rw4zro.c1ci68pz.sf3hvof", function() {
             console.log("mouseOut");
             if (!lockOn) {
                 // $(".MatchModeQuestionScatterBoard .MatchModeQuestionScatterTile").removeClass("rightAnswerAlways");
@@ -119,38 +108,6 @@ $(document).ready(function() {
         });
 
         let lockOn = false;
-
-        // when dragging something
-        // no more drag?
-        // $(".MatchModeLayout").on("mousedown",".MatchModeQuestionScatterTile", function() {
-        //     console.log("dragging");
-
-        //     // lock in the highlighted thing until mouseup
-        //     lockOn = true;
-        //     $(".MatchModeQuestionScatterBoard .MatchModeQuestionScatterTile").removeClass("rightAnswerAlways");
-
-        //     let currText = $(this)[0].textContent;
-        //     console.log(currText);
-
-        //     let other = findOther(currText);
-
-        //     //find element with answer
-        //     $(".MatchModeQuestionScatterBoard div.FormattedText").each(function(index) {
-        //         if ($(this).text() == other) {
-        //             $(this).parent().addClass("rightAnswerAlways");
-
-        //             //should only highlight one answer
-        //             return;
-        //         }
-        //     });
-        // });
-
-        // let go
-        // $(".MatchModeLayout").on("mouseup",".MatchModeQuestionScatterTile", function() {
-        //     console.log("let go");
-        //     lockOn = false;
-        // });
-
 
         function findFirstThatStartsWith(array, text) {
             // try it regularly first...
@@ -182,9 +139,9 @@ $(document).ready(function() {
             // A soft, French, double-crème cheese. Has a texture similar to that of Brie, but has a slightly stron…
             // so should match by "starts with" logic
             // var index = termObj.findIndex(obj=> obj.def==text);
-            console.log(termObj)
-            console.log(termObj.map(obj => obj.def))
-            console.log(termObj.map(obj => obj.term))
+            // console.log(termObj)
+            // console.log(termObj.map(obj => obj.def))
+            // console.log(termObj.map(obj => obj.term))
             var index = findFirstThatStartsWith(termObj.map(obj => obj.def), text);
             if (index == -1) {
                 // var index = termObj.findIndex(obj=> obj.term==text);
@@ -194,11 +151,12 @@ $(document).ready(function() {
                     return null;
                 }
                 else {
+                    console.log("answer: "+termObj[index].def);
                     return termObj[index].def;
                 }
             }
             else {
-                console.log(index)
+                console.log("answer: "+termObj[index].term);
                 return termObj[index].term;
             }
         }

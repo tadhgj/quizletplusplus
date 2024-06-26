@@ -206,13 +206,36 @@ newNode.innerHTML = `<p id='convenientCode' style='display:none'>`+JSON.stringif
 </style>
   `;
 
-// Get the reference node
-setTimeout(function(){
+// wait until .StudyModesLayout is loaded
+// https://stackoverflow.com/questions/5525071/how-to-wait-until-an-element-exists
+
+function waitForElm(selector) {
+    return new Promise(resolve => {
+        if (document.querySelector(selector)) {
+            return resolve(document.querySelector(selector));
+        }
+
+        const observer = new MutationObserver(mutations => {
+            if (document.querySelector(selector)) {
+                observer.disconnect();
+                resolve(document.querySelector(selector));
+            }
+        });
+
+        // If you get "parameter 1 is not of type 'Node'" error, see https://stackoverflow.com/a/77855838/492336
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+}
+
+waitForElm('.StudyModesLayout').then(elm => {
 	var referenceNode = document.querySelector('.StudyModesLayout');
 	
 	// Insert the new node before the reference node
-	referenceNode.after(newNode);
+	referenceNode.after(newNode); // sometimes fails.
 
 	//it aint over until the phat console sings
 	console.log("element added");
-}, 200);
+});
