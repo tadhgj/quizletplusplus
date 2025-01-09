@@ -29,6 +29,9 @@ $(document).ready(function() {
 
         // find span with text 'Get unlimited access', and remove the third parent
         $(".StudyModesLayout div.c8mixic span:contains('Get unlimited access')").parent().parent().parent().remove();
+
+        // find span with text 'Start free trial', and remove the third parent
+        $(".StudyModesLayout div span:contains('Start free trial')").parent().parent().parent().remove();
         
         //add Quizlet++ popup container
         $(".StudyModesLayout").append("<div class='quizletpluspluspopupcontainer'></div>");
@@ -76,44 +79,81 @@ $(document).ready(function() {
         //FIRE ON FLASHCARD CHANGE
         var serviceRunning = false;
 
-        $('.StudyModesLayout').on('DOMSubtreeModified', DOMthing);
+        // $('.StudyModesLayout').on('DOMSubtreeModified', DOMthing);
+        // replace that with a mutation observer
+        // https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+        // https://stackoverflow.com/a/11546242
+
+        let target = document.querySelector('.StudyModesLayout');
+        let config = { attributes: true, childList: true, subtree: true };
+        let observer = new MutationObserver(DOMthing);
+        observer.observe(target, config);
+
 
         let prevQuestionText = "";
         let prevTimestampDom = 0;
         let threshold = 1000;
         let timeoutList = [];
         function DOMthing(e) {
+            // console.log("domthing event")
+            // console.log(e);
             // filter.
-            let Currtarget = e.currentTarget.className;
-            let target = e.target.nodeName;
-            if (Currtarget != "StudyModesLayout" || target != "DIV") {
-                return;
-            }
+            // let Currtarget = e.currentTarget.className;
+            // let target = e.target.nodeName;
+            // if (Currtarget != "StudyModesLayout" || target != "DIV") {
+            //     return;
+            // }
             
-            // attempt to do this without relying on the auto-generated class names
-            // .StudyModesLayout article div[data-testid='Question Text'] - this gets 
+            // // attempt to do this without relying on the auto-generated class names
+            // // .StudyModesLayout article div[data-testid='Question Text'] - this gets 
 
-            // check if question text is present
-            if ($(".StudyModesLayout article div[data-testid='Question Text']").length != 0) {
-                // console.log("question text")
-                qtext = $(".StudyModesLayout article div[data-testid='Question Text']").text();
+            // // check if question text is present
+            // if ($(".StudyModesLayout article div[data-testid='Question Text']").length != 0) {
+            //     // console.log("question text")
+            //     qtext = $(".StudyModesLayout article div[data-testid='Question Text']").text();
 
-                // check dupe
-                if (qtext == prevQuestionText) {
-                    return;
-                }
-                // check empty
-                if (qtext == "") {
-                    return;
-                }
-                prevQuestionText = qtext;
-                console.log(qtext);
+            //     // check dupe
+            //     if (qtext == prevQuestionText) {
+            //         return;
+            //     }
+            //     // check empty
+            //     if (qtext == "") {
+            //         return;
+            //     }
+            //     prevQuestionText = qtext;
+            //     console.log(qtext);
 
-                checkLearnView();
+            //     checkLearnView();
+            //     return;
+            // }
+
+            // return;
+
+            // rewrite the above code to handle e being an array of mutations
+            console.log(e);
+
+            // check if the question text is present
+            let questionText = $(".StudyModesLayout article div[data-testid='Question Text']").text();
+            if (questionText == "") {
                 return;
             }
 
-            return;
+            // check if the question text has changed
+            if (questionText == prevQuestionText) {
+                return;
+            }
+            prevQuestionText = questionText;
+
+            // check empty
+            if (questionText == "") {
+                return;
+            }
+
+            checkLearnView();
+
+
+
+
         }
 
         function checkLearnView() {
