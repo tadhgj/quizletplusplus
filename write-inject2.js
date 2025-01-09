@@ -205,9 +205,9 @@ newNode.innerHTML = `<p id='convenientCode' style='display:none'>`+JSON.stringif
   }
   div.correctAnswer {
     position: absolute;
-    bottom: 11px;
-    left: 16px;
-    font-weight: 600;
+    bottom: 6px;
+    left: 0px;
+    font-weight: 500;
     height: 26px;
 	width: calc(100% - 32px);
 	white-space: pre;
