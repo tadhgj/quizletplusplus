@@ -4,9 +4,6 @@ $(document).ready(function() {
     //add Quizlet++ button
     $(".TopNavigation-contentRight").prepend(`<div class='TopNavigationItem RightNavigationItem'><button class="AssemblyButtonBase AssemblyIconButton AssemblyIconButton--secondary AssemblyButtonBase--medium quizletplusplusbutton" type="button" style='border-radius:25px;padding:0px 12px;font-family:hurme_no2-webfont;font-kerning: normal;font-size: 14px;font-weight:600;'>Quizlet++</button></div>`);
 
-    //add Quizlet++ button
-    $(".t13kodjj").prepend(`<div class='o1c0xcc3'><button class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding AssemblyButtonBase--border quizletplusplusbutton" type="button" style="margin-right:16px">Q++</button></div>`);
-
     // remove ad
     $(".SiteUpgradeButton").parent().remove()
     
@@ -48,20 +45,41 @@ $(document).ready(function() {
 
   //FIRE ON FLASHCARD CHANGE
   var serviceRunning = false;
-  $('.WriteViewController').on('DOMSubtreeModified', function(){
-    if (serviceRunning) {
-      console.log("flashcard changed. checking element now");
-      checkFlashcard();
-    }
-    else {
-      console.log("Flashcard change did nothing. Service not running yet.")
-    }
+  // $('.WriteViewController').on('DOMSubtreeModified', function(){
+  //   if (serviceRunning) {
+  //     console.log("flashcard changed. checking element now");
+  //     checkFlashcard();
+  //   }
+  //   else {
+  //     console.log("Flashcard change did nothing. Service not running yet.")
+  //   }
+  // });
+
+  // replace above with mutation observer
+  // new
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (serviceRunning) {
+        console.log("flashcard changed. checking element now");
+        checkFlashcard();
+        // checkWriting();
+      }
+      else {
+        console.log("ignore; not running yet")
+      }
+    });
+  });
+  observer.observe(document.querySelector('.WriteViewController'), {
+    attributes: true,
+    childList: true,
+    subtree: true
   });
 
   //writing
   function checkWriting() {
     // get question...
-    let question = $("div[data-testid='Question Text']");
+    // let question = $("div[data-testid='Question Text']");
+    let question = $("div.WriteQuestion-prompt");
     console.log("question:", question);
 
     // let questionText = question.find(".FormattedText").text();
@@ -98,8 +116,16 @@ $(document).ready(function() {
     //THIS IS WHERE THE SETTINGS CHECK WOULD COME IN HANDY
     flashCardAnswer = findOtherBestMatch(flashCardText);
     if (flashCardAnswer == null) {
-        console.log("err");
-        return;
+        // console.log("err");
+
+        // check other method
+        if (findOther(flashCardText) == null) {
+          console.log("err (x2)");
+          return;
+        }
+
+        //ALL CLEAR BOYS, THE TERM HAS BEEN FOUND
+        flashCardAnswer = findOther(flashCardText);
     }
 
     //ALL CLEAR BOYS, THE TERM HAS BEEN FOUND
@@ -125,7 +151,7 @@ $(document).ready(function() {
 
     // add span w/ correct answer to input
     //label.AssemblyInput
-    let parentAppned = $("label.AssemblyInput");
+    let parentAppned = $(".WriteQuestion .AutoExpandTextarea-wrapper");
 
     // check if div.correctAnswer already exists
     if (parentAppned.find("div.correctAnswer").length > 0) {
@@ -156,7 +182,7 @@ $(document).ready(function() {
 
     //fetch text
     var flashCardText = $(".ModeLayout-content .FormattedText div").text();
-    console.log(flashCardText);
+    console.log("flash card text: "+flashCardText);
 
     //check if flashcard content actually changed!
     if (previousText == flashCardText) {
@@ -177,7 +203,7 @@ $(document).ready(function() {
 
     //ALL CLEAR BOYS, THE TERM HAS BEEN FOUND
     flashCardAnswer = findOther(flashCardText);
-    // console.log(flashCardAnswer);
+    console.log(flashCardAnswer);
 
     //send popup
     popup(flashCardText + "::" + flashCardAnswer);
@@ -185,6 +211,24 @@ $(document).ready(function() {
     //start listener for up arrow
     upArrowListen = true;
     currentCharCount = 0;
+
+
+    let parentAppned = $(".WriteQuestion .AutoExpandTextarea-wrapper");
+
+    // check if div.correctAnswer already exists
+    if (parentAppned.find("div.correctAnswer").length > 0) {
+        return;
+    }
+
+    // else...
+    let span = $("<div>").attr({
+        "class": "correctAnswer"
+    }).append(
+        $("<span>").text("").addClass("typed"),
+        $("<span>").text("").addClass("restOf")
+    )
+    parentAppned.append(span);
+    updatePlaceholder();
   }
 
 
@@ -238,27 +282,116 @@ $(document).ready(function() {
         }
       });
 
-      $(".WriteViewController").on("keydown", ".AutoExpandTextarea-textarea", function(e) {
-        //check keypress limit
-        //PRESSING ENTER
-        if (e.keyCode == 13 && upArrowListen) {
-          currentCharCount = 0;
-          upArrowListen = false;
-          e.preventDefault();
-          $(this).blur();
-          $(".WriteViewController .TypeTheAnswerField-actions button").focus();
-          $(".WriteViewController .TypeTheAnswerField-actions button").click();
-        }
-        else if (flashCardAnswer != undefined && flashCardAnswer.length > 1 && currentCharCount >= flashCardAnswer.length && upArrowListen) {
-          e.preventDefault();
-          console.log("you've typed it all. stop man");
-          //and just to be sure?
-          $(".AutoExpandTextarea-textarea").val(flashCardAnswer);
-        }
-        else {
-          return;
-        }
+      // $(".WriteViewController").on("keydown", ".AutoExpandTextarea-textarea", function(e) {
+      //   //check keypress limit
+      //   //PRESSING ENTER
+      //   if (e.keyCode == 13 && upArrowListen) {
+      //     currentCharCount = 0;
+      //     upArrowListen = false;
+      //     e.preventDefault();
+      //     $(this).blur();
+      //     $(".WriteViewController .TypeTheAnswerField-actions button").focus();
+      //     $(".WriteViewController .TypeTheAnswerField-actions button").click();
+      //   }
+      //   else if (flashCardAnswer != undefined && flashCardAnswer.length > 1 && currentCharCount >= flashCardAnswer.length && upArrowListen) {
+      //     e.preventDefault();
+      //     console.log("you've typed it all. stop man");
+      //     //and just to be sure?
+      //     $(".AutoExpandTextarea-textarea").val(flashCardAnswer);
+      //   }
+      //   else {
+      //     return;
+      //   }
+      // });
+
+      let prevInputText = "";
+      
+      $(".WriteViewController").on("input", ".AutoExpandTextarea-textarea", function(e) {
+          if (!upArrowListen) {
+              return;
+          }
+
+          let inputSelector = ".AutoExpandTextarea-textarea";
+
+          let currInputText = $(inputSelector).val();
+
+
+          // edit answer
+          let newFlashcardAnswer = flashCardAnswer.replace(/\n/g, " ");
+          flashCardAnswer = newFlashcardAnswer;
+
+          // console.log("input detected");
+          console.log("typed: " + currInputText);
+          console.log("change from last: " + (currInputText.length - prevInputText.length));
+          let totLength = flashCardAnswer.length;
+          let typedLength = currInputText.length;
+
+          if (typedLength > totLength) {
+              console.log("too long");
+              $(inputSelector).val(flashCardAnswer);
+              selectAnswer();
+              return;
+          }
+
+          if (currInputText == flashCardAnswer) {
+              // console.log("correct");
+              upArrowListen = false;
+              $(inputSelector).val(flashCardAnswer);
+              // focus on "answer" button.
+              selectAnswer();
+              return;
+          }
+
+          if (currInputText == flashCardAnswer.substr(0, typedLength)) {
+              // console.log("correct so far");
+              updatePlaceholder();
+              return;
+          }
+
+          // typed wrong. intercept and replace
+          console.log("wrong");
+          $(inputSelector).val(flashCardAnswer.substr(0, typedLength)); 
+          // wait to call this function if another input event has occurred?
+          // because this is sometimes ran after another input has occurred, the 
+          // typing can feel jaunty because letters get "forgotten" about
+          updatePlaceholder();
+          
+          prevInputText = currInputText;
       });
+
+      function selectAnswer() {
+          let answerButton = $("form button[type='submit']");
+          $("").blur();
+          $(answerButton).focus();
+      }
+
+      function updatePlaceholder() {
+          let inputSelector = ".WriteQuestion .AutoExpandTextarea-textarea";
+          let formattedFlashcardAnswer = flashCardAnswer.replace(/\n/g, " ");
+
+          let input = $(inputSelector);
+          let inputText = input.val();
+          let inputLength;
+          let typed = "";
+          let restOf = "";
+
+          if (inputText.length == 0) {
+              // input.attr("placeholder", formattedFlashcardAnswer);
+              // don't change, it's too obvious
+              input.attr("placeholder", "Type the answer");
+          }
+          else {
+              inputLength = inputText.length;
+              typed = formattedFlashcardAnswer.substring(0, inputLength);
+              restOf = formattedFlashcardAnswer.substring(inputLength);
+          }
+
+          let typedSpan = $(".correctAnswer .typed");
+          let restOfSpan = $(".correctAnswer .restOf");
+          typedSpan.text(typed);
+          restOfSpan.text(restOf);
+      }
+
 
       //
       //SEPARATE ON KEYUP FOR BACKSPACES
