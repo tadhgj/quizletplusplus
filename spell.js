@@ -49,14 +49,31 @@ $(document).ready(function() {
 
   //FIRE ON FLASHCARD CHANGE
   var serviceRunning = false;
-  $('.ModeLayout').on('DOMSubtreeModified', function(){
-    if (serviceRunning) {
-      console.log("flashcard changed. checking element now");
-      checkFlashcard();
-    }
-    else {
-      console.log("Flashcard change did nothing. Service not running yet.")
-    }
+  // $('.ModeLayout').on('DOMSubtreeModified', function(){
+  //   if (serviceRunning) {
+  //     console.log("flashcard changed. checking element now");
+  //     checkFlashcard();
+  //   }
+  //   else {
+  //     console.log("Flashcard change did nothing. Service not running yet.")
+  //   }
+  // });
+
+  // replace the above with a mutation observer
+  let observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      console.log("checking mutation for flashcard...")
+      // check if the element is available
+      if (serviceRunning) {
+        checkFlashcard();
+      }
+    });
+  });
+
+  observer.observe(document.querySelector(".site"), {
+    attributes: true,
+    childList: true,
+    subtree: true
   });
   
   let questionHTMLSelector = ".UIDiv.SpellQuestionView-inputPrompt--plain";
