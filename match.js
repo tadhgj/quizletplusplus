@@ -26,8 +26,7 @@ $(document).ready(function() {
         //DOM setup
 
         //add Quizlet++ button
-        $(".anbpm9l").prepend(`<div class="o1c0xcc3"><button type="button" aria-label="Options" class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding quizletplusplusbutton" style="margin-right: 16px"><span>Q++</span></button></div>`);
-
+        $(".arc6ilh").prepend(`<div class='o1c0xcc3'><button class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding AssemblyButtonBase--border quizletplusplusbutton" type="button" style="margin-right:0px">Q++</button></div>`);
         
         //add Quizlet++ popup container
         $(".cvmjmph").append("<div class='quizletpluspluspopupcontainer'></div>");

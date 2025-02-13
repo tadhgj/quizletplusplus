@@ -25,13 +25,13 @@ $(document).ready(function() {
         //DOM setup
 
         //add Quizlet++ button
-        $(".anbpm9l").prepend(`<div class='o1c0xcc3'><button class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding AssemblyButtonBase--border quizletplusplusbutton" type="button" style="margin-right:16px">Q++</button></div>`);
+        $(".arc6ilh").prepend(`<div class='o1c0xcc3'><button class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding AssemblyButtonBase--border quizletplusplusbutton" type="button" style="margin-right:0px">Q++</button></div>`);
 
         // find span with text 'Get unlimited access', and remove the third parent
-        $(".StudyModesLayout div.c8mixic span:contains('Get unlimited access')").parent().parent().parent().remove();
+        // $(".StudyModesLayout div.c8mixic span:contains('Get unlimited access')").parent().parent().parent().remove();
 
         // find span with text 'Start free trial', and remove the third parent
-        $(".StudyModesLayout div span:contains('Start free trial')").parent().parent().parent().remove();
+        $(".StudyModesLayout span:contains('Start free trial')").parent().parent().parent().remove();
         
         //add Quizlet++ popup container
         $(".StudyModesLayout").append("<div class='quizletpluspluspopupcontainer'></div>");
@@ -41,7 +41,7 @@ $(document).ready(function() {
         //ON CLICK OF QUIZLET BUTTON
         $(".site").on("click",".quizletplusplusbutton", function() {
             console.log("Quizlet++ Button Click");
-            $(".quizletplusplusbutton").text("Quizlet++ ✔️");
+            $(".quizletplusplusbutton").text("Q++ ✔️");
             if (!serviceRunning) {
                 popup("Quizlet++ is now working|. Correct answers will be indicated with a dashed border on mouseover. Click away!");
                 serviceRunning = true;
