@@ -89,28 +89,18 @@ $(document).ready(function() {
         let observer = new MutationObserver(DOMthing);
         observer.observe(target, config);
 
+        // fire DOMThing every time page is refocused?
+        $(window).on('focus', DOMthing)
+
 
         let prevQuestionText = "";
         let prevTimestampDom = 0;
         let threshold = 1000;
         let timeoutList = [];
         function DOMthing(e) {
-            // console.log("domthing event")
-            // console.log(e);
-            // filter.
-            // let Currtarget = e.currentTarget.className;
-            // let target = e.target.nodeName;
-            // if (Currtarget != "StudyModesLayout" || target != "DIV") {
-            //     return;
-            // }
             
             // // attempt to do this without relying on the auto-generated class names
             // // .StudyModesLayout article div[data-testid='Question Text'] - this gets 
-
-            // // check if question text is present
-            // if ($(".StudyModesLayout article div[data-testid='Question Text']").length != 0) {
-            //     // console.log("question text")
-            //     qtext = $(".StudyModesLayout article div[data-testid='Question Text']").text();
 
             //     // check dupe
             //     if (qtext == prevQuestionText) {
@@ -121,19 +111,24 @@ $(document).ready(function() {
             //         return;
             //     }
             //     prevQuestionText = qtext;
-            //     console.log(qtext);
-
-            //     checkLearnView();
-            //     return;
-            // }
 
             // return;
 
             // rewrite the above code to handle e being an array of mutations
-            console.log(e);
+            // console.log(e);
+
+            // check if this is a flashcard
+            // if div[data-testid='Card-front'] exists, then it's a flashcard
+            if ($('.StudyModesLayout article div[data-testid="Card-front"]').length > 0) {
+                console.log("Flashcard detected");
+                // check if service is running
+                // do something if it's a flashcard? not now.
+                return;
+            }
 
             // check if the question text is present
             let questionText = $(".StudyModesLayout article div[data-testid='Question Text']").text();
+            console.log(`questionText: ${questionText}`);
             if (questionText == "") {
                 return;
             }
@@ -144,16 +139,7 @@ $(document).ready(function() {
             }
             prevQuestionText = questionText;
 
-            // check empty
-            if (questionText == "") {
-                return;
-            }
-
             checkLearnView();
-
-
-
-
         }
 
         function checkLearnView() {
@@ -193,16 +179,19 @@ $(document).ready(function() {
 
 
                 // 3: written question
-                let writtenTest = $('.StudyModesLayout article').find("label.AssemblyInput");
+                let writtenTestOld = $('.StudyModesLayout article').find("label.AssemblyInput");
+                // they changed the class name to AssemblyInput-heading
+                // leave old one in in case
+                let writtenTest = $('.StudyModesLayout article').find("label.AssemblyInput-heading");
 
-                if (writtenTest.length > 0) {
+                if (writtenTest.length > 0 || writtenTestOld.length > 0) {
                     console.log("Written Question");
                     checkWriting();
                     return;
                 }
 
                 // 4: other test
-                // console.log("");
+                console.log("checkLearnView: no test found");
                 return;
 
             }
