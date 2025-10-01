@@ -24,14 +24,31 @@ $(document).ready(function() {
         console.log("combined.js active...");
         //DOM setup
 
+        // find button with aria-label="Options"
+        var targetButton = $('button[aria-label="Options"]');
+        var targetButtonClasses = targetButton.attr('class');
+        // find the parent wrapper
+        var parentWrapper = targetButton.parent();
+        // get the class of the parent wrapper
+        var parentClass = parentWrapper.attr('class');
+        console.log("parentClass: " + parentClass);
+        // copy that class to a new button
+        var newButton = $("<div>").attr("class", parentClass);
+        // add a button inside the new div
+        newButton.append('<button class="' + targetButtonClasses + ' quizletplusplusbutton" type="button" style="margin-right:0px">Q++</button>');
+        // insert the new button before the target button
+        parentWrapper.before(newButton);
+
         //add Quizlet++ button
-        $(".arc6ilh").prepend(`<div class='o1c0xcc3'><button class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding AssemblyButtonBase--border quizletplusplusbutton" type="button" style="margin-right:0px">Q++</button></div>`);
+        // $(".arc6ilh").prepend(`<div class='o1c0xcc3'><button class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding AssemblyButtonBase--border quizletplusplusbutton" type="button" style="margin-right:0px">Q++</button></div>`);
 
         // find span with text 'Get unlimited access', and remove the third parent
         // $(".StudyModesLayout div.c8mixic span:contains('Get unlimited access')").parent().parent().parent().remove();
 
-        // find span with text 'Start free trial', and remove the third parent
-        $(".StudyModesLayout span:contains('Start free trial')").parent().parent().parent().remove();
+        // find span with text 'free trial', and remove the third parent
+        $(".StudyModesLayout span:contains('free trial')").parent().parent().parent().remove();
+        // is this case sensitive?
+        $(".StudyModesLayout span:contains('Free trial')").parent().parent().parent().remove();
         
         //add Quizlet++ popup container
         $(".StudyModesLayout").append("<div class='quizletpluspluspopupcontainer'></div>");
