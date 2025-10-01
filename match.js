@@ -25,8 +25,23 @@ $(document).ready(function() {
         console.log("match.js active...");
         //DOM setup
 
+        // find button with aria-label="Options"
+        var targetButton = $('button[aria-label="Options"]');
+        var targetButtonClasses = targetButton.attr('class');
+        // find the parent wrapper
+        var parentWrapper = targetButton.parent();
+        // get the class of the parent wrapper
+        var parentClass = parentWrapper.attr('class');
+        console.log("parentClass: " + parentClass);
+        // copy that class to a new button
+        var newButton = $("<div>").attr("class", parentClass);
+        // add a button inside the new div
+        newButton.append('<button class="' + targetButtonClasses + ' quizletplusplusbutton" type="button" style="margin-right:0px">Q++</button>');
+        // insert the new button before the target button
+        parentWrapper.before(newButton);
+
         //add Quizlet++ button
-        $(".arc6ilh").prepend(`<div class='o1c0xcc3'><button class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding AssemblyButtonBase--border quizletplusplusbutton" type="button" style="margin-right:0px">Q++</button></div>`);
+        // $(".arc6ilh").prepend(`<div class='o1c0xcc3'><button class="AssemblyButtonBase AssemblySecondaryButton AssemblyButtonBase--medium AssemblyButtonBase--padding AssemblyButtonBase--border quizletplusplusbutton" type="button" style="margin-right:0px">Q++</button></div>`);
         
         //add Quizlet++ popup container
         $(".cvmjmph").append("<div class='quizletpluspluspopupcontainer'></div>");
@@ -69,41 +84,52 @@ $(document).ready(function() {
             },10000);
         }
 
-        // each item:
-        // .n1rw4zro.c1ci68pz.sf3hvof
+        var eachItemClass = "a b";
+        var formattedEachItemClass = ".a.b";
+        waitForElm("#__next div.FormattedText").then((elm) => {
+            eachItemClass = $("#__next").find("div.FormattedText").parent().parent().parent().attr("class");
+            console.log("eachItemClass: "+eachItemClass);
+            formattedEachItemClass = "."+eachItemClass.split(" ").join(".");
 
-        //on update of MatchModeQuestionScatterBoard, do something
-        // $(".MatchModeLayout").on("mouseover",".MatchModeQuestionScatterTile", function() {
-        // $(".b10wn7cm.bpgrkzt").on("mouseover",".n1rw4zro.c1ci68pz.sf3hvof", function() {
-        // $(".c12t6xyx").on("mouseover",".n1rw4zro.c1ci68pz.sf3hvof", function() {
-        $("div.site").on("mouseover",".n1rw4zro.c1ci68pz.sf3hvof", function() {
-            // console.log($(this))
-            let currText = $(this)[0].textContent;
-            console.log(currText);
+            // each item:
+            // .n1rw4zro.c1ci68pz.sf3hvof
 
-            let other = findOther(currText);
+            // each item:
+            // div.FormattedText.parent().parent().parent()
 
-            //find element with answer
-            // $(".MatchModeQuestionScatterBoard div.FormattedText").each(function(index) {
-            $("div.FormattedText").each(function(index) {
-                if ($(this).text() == other) {
-                    $(this).parent().parent().parent().addClass("rightAnswerAlways");
+            //on update of MatchModeQuestionScatterBoard, do something
+            // $(".MatchModeLayout").on("mouseover",".MatchModeQuestionScatterTile", function() {
+            // $(".b10wn7cm.bpgrkzt").on("mouseover",".n1rw4zro.c1ci68pz.sf3hvof", function() {
+            // $(".c12t6xyx").on("mouseover",".n1rw4zro.c1ci68pz.sf3hvof", function() {
+            $("#__next").on("mouseover",formattedEachItemClass, function() {
+                // console.log($(this))
+                let currText = $(this)[0].textContent;
+                console.log(currText);
 
-                    //should only highlight one answer
-                    return;
+                let other = findOther(currText);
+
+                //find element with answer
+                // $(".MatchModeQuestionScatterBoard div.FormattedText").each(function(index) {
+                $("div.FormattedText").each(function(index) {
+                    if ($(this).text() == other) {
+                        $(this).parent().parent().parent().addClass("rightAnswerAlways");
+
+                        //should only highlight one answer
+                        return;
+                    }
+                });
+            });
+
+            // $(".MatchModeLayout").on("mouseout",".MatchModeQuestionScatterTile", function() {
+            // $(".b10wn7cm.bpgrkzt").on("mouseout",".n1rw4zro.c1ci68pz.sf3hvof", function() {
+            // $(".c12t6xyx").on("mouseout",".n1rw4zro.c1ci68pz.sf3hvof", function() {
+            $("#__next").on("mouseout", formattedEachItemClass, function() {
+                console.log("mouseOut");
+                if (!lockOn) {
+                    // $(".MatchModeQuestionScatterBoard .MatchModeQuestionScatterTile").removeClass("rightAnswerAlways");
+                    $(formattedEachItemClass).removeClass("rightAnswerAlways");
                 }
             });
-        });
-
-        // $(".MatchModeLayout").on("mouseout",".MatchModeQuestionScatterTile", function() {
-        // $(".b10wn7cm.bpgrkzt").on("mouseout",".n1rw4zro.c1ci68pz.sf3hvof", function() {
-        // $(".c12t6xyx").on("mouseout",".n1rw4zro.c1ci68pz.sf3hvof", function() {
-        $("div.site").on("mouseout",".n1rw4zro.c1ci68pz.sf3hvof", function() {
-            console.log("mouseOut");
-            if (!lockOn) {
-                // $(".MatchModeQuestionScatterBoard .MatchModeQuestionScatterTile").removeClass("rightAnswerAlways");
-                $(".n1rw4zro.c1ci68pz.sf3hvof").removeClass("rightAnswerAlways");
-            }
         });
 
         let lockOn = false;

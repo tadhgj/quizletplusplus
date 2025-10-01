@@ -175,8 +175,8 @@ function waitForElm(selector) {
     });
 }
 
-waitForElm('.cvmjmph').then(elm => {
-	var referenceNode = document.querySelector('.cvmjmph');
+waitForElm('#__next').then(elm => {
+	var referenceNode = document.querySelector('#__next');
 	
 	// Insert the new node before the reference node
 	referenceNode.after(newNode); // sometimes fails.
