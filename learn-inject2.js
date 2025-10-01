@@ -1,4 +1,3 @@
-
 // Get the script element by its ID
 var scriptElement = document.getElementById("__NEXT_DATA__");
 
